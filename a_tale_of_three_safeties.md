@@ -18,4 +18,13 @@ Midori 是在三种安全性的基础上建立的：类型、内存以及并发�
 
 为了利用它们其中最好的部分，多种技术经常相互结合使用，称之为深度防护。
 
+保证安全性的运行时方面的方法包括 [Google 的 C++ sanitizers](https://github.com/google/sanitizers) 和 [微软的 "/guard" 特性](http://blogs.msdn.com/b/vcblog/archive/2014/12/08/visual-studio-2015-preview-work-in-progress-security-feature.aspx)。语言方面的方法包括 C#、Java、绝大多数函数式语言、Go 等等。但我们已经发现一些攻击，因为 C# 有 unsafe 关键字允许违反安全性的 unsafe 区域。
+
+那么，现在你要开发一个操作系统，主要任务是要控制硬件资源、缓冲区、服务和应用程序并行运行，诸如此类，所有的的这些都是该死的不安全 (unsafe) 的东西，你该如何使用安全的语言来搞定呢？好问题！
+
+答案出乎意料的简单：分层。
+
+系统里面当然有一些不安全的代码。每一个不安全的组件负责封装它们不安全的部分。说得容易做起来难，要搞对这些是系统里面最难的部分。这就是为什么我们要尽可能保持这个所谓的 [可信计算基](https://en.wikipedia.org/wiki/Trusted_computing_base) (TCB) 越小越好。在操作系统核心和运行时里没有东西使用不安全的代码，只有微内核里非常少的部分有使用它。是的，我们的操作系统调度器和内存管理器都是用安全代码编写的。所有的应用级程序和库都是 100% 的安全代码，就像我们整个 Web 浏览器一样。
+
+依赖类型安全性的一个有趣的方面是[你的编译器](https://en.wikipedia.org/wiki/Bartok_(compiler))变成了你可信计算基 (TCB) 的一部分。虽然我们的编译器使用安全语言写的，但它生成供处理器执行的指令。这风险可以通过类似自带证明代码和[类型化汇编语言 (TAL)](https://en.wikipedia.org/wiki/Typed_assembly_language) 稍微补救一下。再加上运行时检查，如软件故障隔离等，也能减轻这种风险。
 
