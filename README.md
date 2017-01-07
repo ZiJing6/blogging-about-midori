@@ -11,13 +11,13 @@
 我首先得承认，我们也不知道最后 Midori 会怎么样。这对研究来说很正常。我最遗憾的是我们没有一开始就将它开源，这样整个互联网的精英就能够合理地评判它了。像其他所有的大公司一样，决定 Midori 核心技术的命运的因素，不是完全技术驱动的，更悲哀的是，甚至不是完全业务驱动的。不过在这方面我们也学到了一些重要的教训。另一个我最遗憾的是没有多发表几篇论文。所以写下这些博客，当是一种弥补。
 
 新文章发表后，我将会更新下面这个列表。  
-    1. [三种安全](https://github.com/Ruikuan/blogging-about-midori/blob/master/a_tale_of_three_safeties.md)   
-    2. [作为安全能力的对象](https://github.com/Ruikuan/blogging-about-midori/blob/master/objects_as_secure_capabilities.md)  
-    3. [异步一切](https://github.com/Ruikuan/blog/blogging-about-midori/blob/master/asynchronous_everything.md)  
-    4. [安全的本地代码](https://github.com/Ruikuan/blogging-about-midori/blob/master/safe_native_code.md)  
-    5. [错误模型](https://github.com/Ruikuan/blogging-about-midori/blob/master/the_error_model.md)  
-    6. [性能文化](https://github.com/Ruikuan/blogging-about-midori/blob/master/performance_culture.md)  
-    7. [为并发 15 年](https://github.com/Ruikuan/blogging-about-midori/blob/master/15_years_of_concurrency.md)  
+    1. [三种安全](https://github.com/ZiJing6/blogging-about-midori/blob/master/a_tale_of_three_safeties.md)   
+    2. [作为安全能力的对象](https://github.com/ZiJing6/blogging-about-midori/blob/master/objects_as_secure_capabilities.md)  
+    3. [异步一切](https://github.com/ZiJing6/blogging-about-midori/blob/master/asynchronous_everything.md)  
+    4. [安全的本地代码](https://github.com/ZiJing6/blogging-about-midori/blob/master/safe_native_code.md)  
+    5. [错误模型](https://github.com/ZiJing6/blogging-about-midori/blob/master/the_error_model.md)  
+    6. [性能文化](https://github.com/ZiJing6/blogging-about-midori/blob/master/performance_culture.md)  
+    7. [为并发 15 年](https://github.com/ZiJing6/blogging-about-midori/blob/master/15_years_of_concurrency.md)  
 
 Midori 是一趟迷人的旅程，是我职业生涯里最开心的一段日子。我愿能够分享这旅程的一部分给你。 
 
