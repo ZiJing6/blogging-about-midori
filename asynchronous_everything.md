@@ -7,6 +7,6 @@ Midori 是由很多超轻量级、细粒度进程构成的，它们通过强类�
 
 ## 异步编程模型
 
-Midori的异步编程模型表面上很像 C# 的 async/await。
+Midori 的异步编程模型表面上很像 C# 的 async/await。
 
 这当然不是巧合。
