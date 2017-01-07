@@ -13,7 +13,7 @@
 新文章发表后，我将会更新下面这个列表。  
     1. [三种安全](https://github.com/Ruikuan/blogging-about-midori/blob/master/a_tale_of_three_safeties.md)   
     2. [作为安全能力的对象](https://github.com/Ruikuan/blogging-about-midori/blob/master/objects_as_secure_capabilities.md)  
-    3. [异步一切](https://github.com/Ruikuan/blog/blogging-about-midori/master/asynchronous_everything.md)  
+    3. [异步一切](https://github.com/Ruikuan/blog/blogging-about-midori/blob/master/asynchronous_everything.md)  
     4. [安全的本地代码](https://github.com/Ruikuan/blogging-about-midori/blob/master/safe_native_code.md)  
     5. [错误模型](https://github.com/Ruikuan/blogging-about-midori/blob/master/the_error_model.md)  
     6. [性能文化](https://github.com/Ruikuan/blogging-about-midori/blob/master/performance_culture.md)  
