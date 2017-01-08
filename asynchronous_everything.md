@@ -51,4 +51,53 @@ Promise<U> u = p.WhenResolved(
 
 注意这个 promise 链。操作的 callback 要不返回一个类型为 U 的值，要不根据情况扔出一个异常。然后 u promise 的使用者再干同样的活，一而再，再而三。
 
+这就是[并发](https://en.wikipedia.org/wiki/Concurrent_computing#Concurrent_programming_languages)[数据流](https://en.wikipedia.org/wiki/Dataflow_programming)编程。
+它很好用，因为一系列操作的真值依赖（true dependencies）组织起系统活动的调度。传统的系统不是因为真值依赖，而是因为[假值依赖](https://en.wikipedia.org/wiki/Data_dependency)经常发生故障，
+像程序突然在深层的异步 IO 调用中出了问题，但调用者却不知情。
+
+实际上，你 Windows 的屏幕经常卡住变白可能就是因为这个引起的。我永远不会忘记几年前找到导致 Outlook 挂起的主要原因之一的那份报告。一个经常使用的 API 偶尔会尝试访问网络上的打印机
+以枚举附加的字体。它将这些字体缓存下来，这样隔一段时间才需访问打印机一次，隔一段无法预测的时间。结果，这种“好”的表现让开发人员觉得从 UI 线程调用它是没问题的。测试的时候也没出什么
+问题（嗯，可能开发人员用很值钱的电脑，在接近完美的网络下工作）。悲催的是，当网络卡爆时，结果就出现一个 10 秒的挂起白屏跟一个旋转圆圈鼠标。一直到现在，在我用过的每一个操作系统中，还是
+会有这种问题。
+
+上面例子的问题在于开发者调用 API 时，高延迟有没显现出来的可能性。当调用被深深地埋在调用栈深处，标记位虚函数调用等，那就更难显现出来了。在 Midori 里，所有的异步性是在类型系统表现出来的，
+这种问题不可能会发生，因为类似的 API 必然会返回一个 promise 。当然，开发者仍然可以干些荒唐事（像在 UI 线程里面搞个无限循环），但要搞砸已经难得多了。特别是跟 IO 相关的话。
+
+你不想数据流链继续了？没问题。
+
+```csharp
+p.WhenResolved(
+    ... as above ...
+).Ignore();
+
+```
+
+这结果证明是有一点反模式，它通常是你正在修改共享状态的一个信号。
+
+这个 Ignore 得稍微解释一下。我们的语言不许你忽略返回值，除非你显式表明要这样做。若你意外地忽略一些或很多重要的东西（例如：一个异常），这个特定的 Ignore 方法还会加入一些诊断信息来帮助调试。
+
+最后我们为常用的模式加入了一堆帮助方法重载和 API：
+
+```csharp
+// Just respond to success, and propagate the error automatically:
+Promise<U> u = p.WhenResolved((T t) => { ... the T is available ... });
+
+// Use a finally-like construct:
+Promise<U> u = p.WhenResolved(
+    (T t) => { ... the T is available ... },
+    (Exception e) => { ... a failure occurred ... },
+    () => { ... unconditionally executes ... }
+);
+
+// Perform various kinds of loops:
+Promise<U> u = Async.For(0, 10, (int i) => { ... the loop body ... });
+Promise<U> u = Async.While(() => ... predicate, () => { ... the loop body ... });
+
+// And so on.
+```
+
+这当然远不是新点子了。[Joule](https://en.wikipedia.org/wiki/Joule_(programming_language)) 和 [Alice](https://en.wikipedia.org/wiki/Alice_(programming_language)) 语言
+甚至有内置的语法让类似上面的笨重的回调传递变得让人更能忍受。
+
+但它仍然还是不可忍受的。这编程模型扔掉了一大堆熟悉的编程语言构造，像循环。
 
