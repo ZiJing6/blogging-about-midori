@@ -99,5 +99,5 @@ Promise<U> u = Async.While(() => ... predicate, () => { ... the loop body ... })
 这当然远不是新点子了。[Joule](https://en.wikipedia.org/wiki/Joule_(programming_language)) 和 [Alice](https://en.wikipedia.org/wiki/Alice_(programming_language)) 语言
 甚至有内置的语法让类似上面的笨重的回调传递变得让人更能忍受。
 
-但它仍然还是不可忍受的。这编程模型扔掉了一大堆熟悉的编程语言构造，像循环。
+但它仍然还是让人没法忍。这编程模型扔掉了一大堆熟悉的编程语言构造，像循环。
 
