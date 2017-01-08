@@ -17,3 +17,38 @@ Midori 的异步编程模型表面上很像 C# 的 async/await。
 
 但我得超越自己。要进行一个很长的旅程才能接触到现在这点，让我们从最开始的地方启程吧。
 
+## Promises
+
+在我们异步模型的核心是一个叫 [promises](https://en.wikipedia.org/wiki/Futures_and_promises) 的技术。现在，这个概念已经相当普遍了。
+但就像等会你会看到的那样，我们使用 promises 的方式更有趣些。我们受 [E 系统](https://en.wikipedia.org/wiki/E_(programming_language))的影响很深。
+也许跟现在流行的大多数异步框架最大的不同是我们完全不玩虚的，在我们系统里面连一个同步的 API 都没有。
+
+异步模型的第一版用的是显式的回调（callbacks）。这东西用过 Node.js 的都知道。主要想法就是你得到的任何一个操作的 Promise<T>，最终会给你一个结果 T （或出错了）。
+这个 T 可能由内部的异步处理甚至在远程的某个地方跑出来的，不过使用它的就不需要关心了。它们只是把 Promise<T> 当作普通的类型处理，去索取的时候，必须将 T 交出来。
+
+基本的 callback 模型开始像下面一样：
+
+```csharp
+Promise<T> p = ... some operation ...;
+
+... 可选地跟 p 里面的操作并发地做一些事情 ...;
+
+Promise<U> u = Promise.When(
+    p,
+    (T t) => { ... the T is available ... },
+    (Exception e) => { ... a failure occurred ... }
+);
+```
+
+后来我们将静态方法改成了实例方法：
+
+```csharp
+Promise<U> u = p.WhenResolved(
+    (T t) => { ... the T is available ... },
+    (Exception e) => { ... a failure occurred ... }
+);
+```
+
+注意这个 promise 链。操作的 callback 要不返回一个类型为 U 的值，要不根据情况扔出一个异常。然后 u promise 的使用者再干同样的活，一而再，再而三。
+
+
