@@ -63,7 +63,7 @@ Promise<U> u = p.WhenResolved(
 上面例子的问题在于开发者调用 API 时，高延迟有没显现出来的可能性。当调用被深深地埋在调用栈深处，标记位虚函数调用等，那就更难显现出来了。在 Midori 里，所有的异步性是在类型系统表现出来的，
 这种问题不可能会发生，因为类似的 API 必然会返回一个 promise 。当然，开发者仍然可以干些荒唐事（像在 UI 线程里面搞个无限循环），但要搞砸已经难得多了。特别是跟 IO 相关的话。
 
-你不想数据流链继续了？没问题。
+你不想数据流链继续下去了？没问题。
 
 ```csharp
 p.WhenResolved(
@@ -72,7 +72,7 @@ p.WhenResolved(
 
 ```
 
-这结果证明是有一点反模式，它通常是你正在修改共享状态的一个信号。
+这被证明有一点反模式，它通常是你正对共享状态作修改的一个信号。
 
 这个 Ignore 得稍微解释一下。我们的语言不许你忽略返回值，除非你显式表明要这样做。若你意外地忽略一些或很多重要的东西（例如：一个异常），这个特定的 Ignore 方法还会加入一些诊断信息来帮助调试。
 
@@ -97,7 +97,41 @@ Promise<U> u = Async.While(() => ... predicate, () => { ... the loop body ... })
 ```
 
 这当然远不是新点子了。[Joule](https://en.wikipedia.org/wiki/Joule_(programming_language)) 和 [Alice](https://en.wikipedia.org/wiki/Alice_(programming_language)) 语言
-甚至有内置的语法让类似上面的笨重的回调传递变得让人更能忍受。
+甚至有内置的语法让类似上面的笨重的回调传递变得让人更好受点。
 
-但它仍然还是让人没法忍。这编程模型扔掉了一大堆熟悉的编程语言构造，像循环。
+但它还是让人没法忍。这编程模型扔掉了一大堆熟悉的编程语言构造，像循环。
+
+这非常非常非常差！它会导致回调困境（callback soup）、非常多层次的嵌套，而且经常在需要保证正确性的真正重要的代码里出现。想象一下你在一个磁盘驱动程序里面，看到这样的的代码：
+
+```csharp
+Promise<void> DoSomething(Promise<string> cmd) {
+    return cmd.WhenResolved(
+        s => {
+            if (s == "...") {
+                return DoSomethingElse(...).WhenResolved(
+                    v => {
+                        return ...;
+                    },
+                    e => {
+                        Log(e);
+                        throw e;
+                    }
+                );
+            }
+            else {
+                return ...;
+            }
+        },
+        e => {
+            Log(e);
+            throw e;
+        }
+    );
+}
+```
+
+根本不可能搞清楚会发生什么。很难知道这各种各样的 return 到底 return 到哪里，什么异常没有被处理，而且非常容易导致重复代码（例如上面的 error 分支），因为经典的
+代码块范围已经不适用了。上帝保佑，你需要的只是一个循环。而这正是一个磁盘驱动 —— 最需要可靠性的那块！
+
+## 进入 Async 和 Await
 
