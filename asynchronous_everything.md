@@ -118,3 +118,6 @@ Promise<void> DoSomething(Promise<string> cmd) {
 
 ## 进入 Async 和 Await
 
+[几乎](https://msdn.microsoft.com/en-us/library/hh156528.aspx)[每一个](http://tc39.github.io/ecmascript-asyncawait/)[重要的](https://www.python.org/dev/peps/pep-0492/)[语言](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4134.pdf)现在都具备类似 async 和/或 await 特性。而我们是从 2009 年开始大范围使用的。我说的大范围，那是真的大范围。
+
+async/await 让我们保持系统的非阻塞本性并且消除了上述的一些可用性混乱。事后看来，这是很显然的，但请记住当时使用 await 上规模的最主流的的语言也不过是 F#，用它的[异步工作流](http://blogs.msdn.com/b/dsyme/archive/2007/10/11/introducing-f-asynchronous-workflows.aspx)（也看看[这篇论文](http://research.microsoft.com/apps/pubs/default.aspx?id=147194)）。尽管在可用性和生产力上很有好处，但在队伍里也有很大的争议，后来更多。
