@@ -124,7 +124,7 @@ async/await 让我们保持系统的非阻塞本性并且消除了上述的一�
 
 我们搞的这套跟 C# 和 .NET 里的有点不同。让我们跟随从上面说的 promises 到新的基于 async/await 模型的脚步。我们一路走，一路我会指出它们的不同之处。
 
-我们一开始将 Promise&lt;T> 重命名为 AsyncResult&lt;T>，将它设计成 struct。（这跟 .NET 的 Task&lt;T> 很相似，但比起“计算”，更关注“数据”。）这样一个相关类型的家族就诞生了：
+我们首先将 Promise&lt;T> 重命名为 AsyncResult&lt;T>，将它设计成 struct。（这跟 .NET 的 Task&lt;T> 很相似，但比起“计算”，更关注“数据”。）这样一个相关类型的家族就诞生了：
 
 * T： 不会失败的同步计算即刻返回的结果。
 * Async&lt;T>： 不会失败的异步计算的结果。
@@ -152,3 +152,38 @@ async int Bar() {
 ```
 
 开始这只不过是解决回调麻烦的语法糖，像 C# 里一样。但在最终，我们更进一步，为了性能，加入了轻量级的协程（coroutine）和链表栈（linked stack）。下面会提及更多。
+
+要调用 async 方法的调用者必须做出选择：是用 await 并等待方法的结果呢？还是用 async 并执行异步的操作？所有的异步性在系统因此显式为：
+
+```csharp
+int x = await Bar();        // Invoke Bar, but wait for its result.
+Async<int> y = async Bar(); // Invoke Bar asynchronously; I'll wait later.
+int z = await y;            // ...like now.  This waits for Bar to finish.
+```
+
+这也给我们带来了一个非常重要但微妙的特性，这是我们很后面才认识到的。因为在 Midori 里面“等待”某样东西的唯一的办法是使用异步模型，而且没有隐藏的阻塞。我们的类型系统能告诉我们所有的能“等待”的东西。更重要的是，它能告诉我们所有不能等待的东西，这就是纯粹的同步计算！这就能用来保证没有代码能够阻塞 UI 绘画，以及其他的，我们下面能看到，非常多很强的能力。
+
+因为系统中异步代码的绝对量太大，我们在语言里修饰了很多 C# 还没有支持的模式。例如迭代器，for 循环和 LINQ 查询：
+
+```csharp
+IAsyncEnumerable<Movie> GetMovies(string url) {
+    foreach (await var movie in http.Get(url)) {
+        yield return movie;
+    }
+}
+```
+
+或者，用 LINQ 的风格：
+
+```csharp
+IAsyncEnumerable<Movie> GetMovies(string url) {
+    return
+        from await movie in http.Get(url)
+        ... filters ...
+        select ... movie ...;
+}
+```
+
+整个 LINQ 体系是流式处理的，包括资源管理和[背压](https://en.wikipedia.org/wiki/Back_pressure)。
+
+我们将数百万行的代码从旧的 callback style 转换成新的 async/await 方式。这个过程中发现了大量 bug，由原先显式回调模型的复杂的控制流造成的。特别是在循环和错误处理逻辑中，相比原来的愚蠢的 API 版本，现在能用熟悉的编程语言结构了。
