@@ -122,7 +122,7 @@ Promise<void> DoSomething(Promise<string> cmd) {
 
 async/await 让我们保持系统的非阻塞本性并且消除了上述的一些可用性混乱。事后看来，这是很显然的，但请记住当时使用 await 上规模的最主流的的语言也不过是 F#，用它的[异步工作流](http://blogs.msdn.com/b/dsyme/archive/2007/10/11/introducing-f-asynchronous-workflows.aspx)（也看看[这篇论文](http://research.microsoft.com/apps/pubs/default.aspx?id=147194)）。尽管在可用性和生产力上很有好处，但在队伍里也有很大的争议，后来更多。
 
-我们搞的这套跟 C# 和 .NET 里的有点不同。让我们跟随从上面说的 promises 到新的基于 async/await 模型的脚步。我们一面走，一面我会指出它们的不同之处。
+我们搞的这套跟 C# 和 .NET 里的有点不同。让我们跟随从上面说的 promises 到新的基于 async/await 模型的脚步。我们一路走，路上我会指出它们的不同之处。
 
 我们一开始将 Promise<T> 重命名为 AsyncResult<T>，将它设计成 struct。（这跟 .NET 的 Task<T> 很相似，但比起“计算”，更关注“数据”。）这样一个相关类型的家族就诞生了：
 
