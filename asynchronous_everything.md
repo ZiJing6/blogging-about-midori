@@ -121,3 +121,34 @@ Promise<void> DoSomething(Promise<string> cmd) {
 [几乎](https://msdn.microsoft.com/en-us/library/hh156528.aspx)[每一个](http://tc39.github.io/ecmascript-asyncawait/)[重要的](https://www.python.org/dev/peps/pep-0492/)[语言](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4134.pdf)现在都具备类似 async 和/或 await 特性。而我们是从 2009 年开始大范围使用的。我说的大范围，那是真的大范围。
 
 async/await 让我们保持系统的非阻塞本性并且消除了上述的一些可用性混乱。事后看来，这是很显然的，但请记住当时使用 await 上规模的最主流的的语言也不过是 F#，用它的[异步工作流](http://blogs.msdn.com/b/dsyme/archive/2007/10/11/introducing-f-asynchronous-workflows.aspx)（也看看[这篇论文](http://research.microsoft.com/apps/pubs/default.aspx?id=147194)）。尽管在可用性和生产力上很有好处，但在队伍里也有很大的争议，后来更多。
+
+我们搞的这套跟 C# 和 .NET 里的有点不同。让我们跟随从上面说的 promises 到新的基于 async/await 模型的脚步。我们一面走，一面我会指出它们的不同之处。
+
+我们一开始将 Promise<T> 重命名为 AsyncResult<T>，将它设计成 struct。（这跟 .NET 的 Task<T> 很相似，但比起“计算”，更关注“数据”。）这样一个相关类型的家族就诞生了：
+
+* T： 不会失败的同步计算即刻返回的结果。
+* Async<T>： 不会失败的异步计算的结果。
+* Result<T>： 可能会失败的同步计算即刻返回的结果。
+* AsyncResult<T>： 可能会失败的异步计算的结果。
+
+最后一个其实只是 Async<Result<T>> 的简写。
+
+会失败的和不会失败的区别是以后会提到的另一个课题。总而言之，不管怎样，我们的类型为我们保证了这些属性。
+
+顺着下去，我们加入了 await 和 async 关键字。一个方法能被标记为 async：
+
+```csharp
+async int Foo() { ... }
+```
+
+这意味着在它里面允许 await:
+
+```csharp
+async int Bar() {
+    int x = await Foo();
+    ...
+    return x * x;
+}
+```
+
+开始这只不过是解决回调麻烦的语法糖，像 C# 里一样。但在最终，我们更进一步，为了性能，加入了轻量级的协程（coroutine）和链表栈（linked stack）。下面会提及更多。
