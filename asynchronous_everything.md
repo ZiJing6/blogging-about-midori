@@ -208,3 +208,8 @@ Async<int> Bar() { return async Foo(); }
 但在旅程的结束往回看，这个改变还是值得的，在模型的简单性和可用性，也在于它给我们打开了一些优化的大门。
 
 ## 执行模型 
+
+这就引出了执行模型。我们经历了也许五个不同的模型，但最后着陆在一个不错的地方。
+
+完成异步一切的一个关键是超轻量级进程。这是可能做到的，多亏在[上一篇提到的安全基础](https://github.com/ZiJing6/blogging-about-midori/blob/master/a_tale_of_three_safeties.md)上构建的[软件隔离进程（SIPs）](http://research.microsoft.com/apps/pubs/default.aspx?id=71996)。
+
