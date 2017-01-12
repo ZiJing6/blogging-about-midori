@@ -42,7 +42,7 @@ Midori 是在三种安全性的基础上建立的：类型、内存以及并发�
 
 注意我可没说过我们禁止所有的并发，我们只是禁止不安全的并发。首先，大部分的系统内的并发表现为在轻量级的[软隔离进程](http://research.microsoft.com/apps/pubs/default.aspx?id=71996)间使用消息传递。其次，对于同一个进程的并发，我们形式化了安全共享内存并行的规则，通过类型系统和编程模型规则来确保这点。结果就是你不会写出共享内存的数据争用。
 
-引致这种形式化的一个关键的洞悉是没有共享同一个地址空间的两个“线程”被允许同时看到可修改的同一个对象。多个可能同时在读同一块内存，一个可能在写，但不能多个同时写。一些细节在[我们的 OOPSLA 论文（安全并行中的唯一性和引用不变性）](http://research.microsoft.com/apps/pubs/default.aspx?id=170528)中有讨论，还有 Rust 也完成了类似的成果[并文档化得很好](http://blog.rust-lang.org/2015/04/10/Fearless-Concurrency.html)。对多数细粒度的并行来说，这种规则工作得足够好了，就像我们的多媒体栈一样。
+引致这种形式化的一个关键的洞悉是没有两个共享同一个地址空间的“线程”被允许同时看到可修改的同一个对象。多个线程可以同时读同一块内存，一个线程可以写，但不能多个线程同时写。一些细节在[我们的 OOPSLA 论文（安全并行中的唯一性和引用不变性）](http://research.microsoft.com/apps/pubs/default.aspx?id=170528)中有讨论，还有 Rust 也完成了类似的成果[并文档化得很好](http://blog.rust-lang.org/2015/04/10/Fearless-Concurrency.html)。对多数细粒度的并行来说，这种规则工作得足够好了，就像我们的多媒体栈一样。
 
 Midori 之后，我一直致力于将怎样同时实现安全和高效 (performance) 的经验带到 .NET 和 C++ 中。可能目前可见的成果只有我们近段时间作为 C++ 核心指引的一部分发布的[安全 profiles](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#S-profile)。我希望在 C# 7 中和我们正在搞的 .NET 跨平台 C# AOT 中，有更多的成果出现。Midori 是一块处女地，而当前的这些环境需要微妙的折中和妥协，是充满乐趣，但减慢了将这些点子转化为产品的速度。我很高兴开始见到终于结出了一些果实。
 
