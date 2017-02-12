@@ -291,3 +291,21 @@ class MyTree : ITree {
     async ITree Right() { ... }
 }
 ```
+
+正如你猜的那样，客户端会通过代理对象，连接到服务器端的运行在进程中的对象，有可能服务端跟客户端在同一个进程里，但多数情况下对象是远程的，因为这是进程之间彼此通讯的方式：
+
+```csharp
+class MyProgram {
+    async void Main(IConsole console, ICalculator calc) {
+        var result = await calc.Add(2, 2);
+        await console.WriteLine(result);
+    }
+}
+```
+
+设想一下计算器是一个系统服务，这个程序将与系统服务通信，将两个数字加在一起，然后将结果打印到控制台（控制台本身也可能是一个不同的服务）。
+
+系统中一些关键的方面是消息传递非常有效率。首先，所有有必要在进程间交付的数据结构都是出于用户模式的，所以不需要进行核心模式的转换。实际上，他们绝大多数都是无锁的。第二，系统采用一种称为“流水线（pipelining）”的技术来消除往返和同步乒乓（synchronization ping-ponging）。大批大批的消息能填充到管道中直到管道被填满。它们隔一段时间被分开传输。最后，一种崭新称为“第三方切换”的技术被用来缩短消息传递中各方之间的通讯路径。这消除了中间方，通常它的工作只是简单地转发消息，没有带来什么价值，除了延迟和浪费。
+
+![消息传递](http://joeduffyblog.com/assets/img/2015-11-19-asynchronous-everything.pipeline.jpg)
+
