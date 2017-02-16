@@ -309,3 +309,31 @@ class MyProgram {
 
 ![消息传递](http://joeduffyblog.com/assets/img/2015-11-19-asynchronous-everything.pipeline.jpg)
 
+只有以下类型能够封送跨越消息传递边界：
+
+* 基本类型（例如：int，string 等）。
+* 自定义的不包含指针的数据结构（显式标记封送）。
+* 指向 stream 的引用（下面会说）。
+* 对其他异步对象的引用（例如：我们上面的 ICalculator）。
+* 一种特别的 SharedData 对象，这个下面会进一步解释。
+
+大部分是很明显的。不过 SharedData 有点特别。Midori 中有一个“零拷贝”的基本哲学。这是一个将来会有一篇文章讨论的主题。这是我们在一些关键基准上性能超过许多经典系统的秘密武器。基本的想法是，如果能够避免的话，没有一个字节应该被复制。例如，所以在进程间进行消息传递时，我们不想通过复制来封送字节数组（byte[]）。SharedData 是一种指向进程间共享的堆中一些不可变数据的自动引用计数的指针。操作系统内核管理这个堆内存，并且在所有引用减为零时进行回收。因为引用计数是自动的，程序不会出问题。这利用了我们语言的一些新特性，如析构函数。
+
+我们还有“邻近对象（near objects）”的概念，需要一个额外的不走，能让你在同一个进程对中封送不可变数据的引用。这让你可以通过引用来封送富（rich）对象。例如：
+
+```csharp
+// An asynchronous object in my heap:
+ISpellChecker checker = ...;
+
+// A complex immutable Document in my heap,
+// perhaps using piece tables:
+immutable Document doc = ...;
+
+// Check the document by sending messages within
+// my own process; no copies are necessary:
+var results = await checker.Check(doc);
+```
+
+正如你猜测的那样，所有的这些都是建立在一个更基础的 “通道（channel）” 概念之上的。这跟你在 [Occam](https://en.wikipedia.org/wiki/Occam_(programming_language))，[Go](https://en.wikipedia.org/wiki/Go_(programming_language)) 和相关的 [通信顺序进程（CSP）](https://en.wikipedia.org/wiki/Communicating_sequential_processes) 语言中看到的类似。我个人发现消息如何在系统周围浮动的结构和相关的检查比直接面对通道编程更令人舒服，但你可能会有所异议。结果跟用 [actor](https://en.wikipedia.org/wiki/Actor_model) 编程类似，但在进程和对象标识的关系方面有些关键的差别。
+
+## 流（Streams）
