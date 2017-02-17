@@ -337,3 +337,33 @@ var results = await checker.Check(doc);
 正如你猜测的那样，所有的这些都是建立在一个更基础的 “通道（channel）” 概念之上的。这跟你在 [Occam](https://en.wikipedia.org/wiki/Occam_(programming_language))，[Go](https://en.wikipedia.org/wiki/Go_(programming_language)) 和相关的 [通信顺序进程（CSP）](https://en.wikipedia.org/wiki/Communicating_sequential_processes) 语言中看到的类似。我个人发现消息如何在系统周围浮动的结构和相关的检查比直接面对通道编程更令人舒服，但你可能会有所异议。结果跟用 [actor](https://en.wikipedia.org/wiki/Actor_model) 编程类似，但在进程和对象标识的关系方面有些关键的差别。
 
 ## 流（Streams）
+
+我们的框架有两种基础的流类型：包含字节流的 Stream 和包含 T 序列的 Sequence&lt;T>。它们都是只向前存取的（forward-only）（我们有另外分开的可随机访问的类）并且 100% 的异步。
+
+你猜，为什么会有两种类型呢？他们开始是完全独立的东西，最终变成了兄弟关系，共享很多策略和实现。然而，他们仍然保持不同的关键原因在于，如果你知道你正在处理的是原始的字节流时，你可以在实现中进行大量又去的性能改进，相对于一个完全的泛型版本而言。
+
+为了我们现在讨论的目的，暂且让我们设想 Stream 和 Sequence&lt;T> 是同构的。
+
+如之前提到的，我们还有  IAsyncEnumerable&lt;T> 和 IAsyncEnumerator&lt;T> 类型，当你想消费某些东西时，它们是你编码中最通用的接口。当然，开发人员能够实现他们自己的流类型，特别是因为我们在语言中有异步的迭代器。一组完整的异步 LINQ 操作在这些接口上工作，因此 LINQ 非常适合消费和组合流和序列。
+
+除了上面的基于枚举的消费技术之外，所有标准的 peeking 和基于批量的 API 也是可用的。然而，必须指出，整个系统的框架是在内核的零拷贝能力的基础上构建的，为了避免复制。每次我在 .NET 中看到使用 byte[] 来处理流，都会让我留下热泪。结果就是我们的流在系统中非常基础的地方使用，像网络栈自己，文件系统，Web 服务器，还有更多。
+
+之前提过，我们在流 API 中支持推和拉两种风格的并发。例如，我们支持两种风格的生成器（generator）：
+
+```csharp
+// Push:
+var s = new Stream(g => {
+    var item = ... do some work ...;
+    g.Push(item);
+});
+
+// Pull:
+var s = new Stream(g => {
+    var item = await ... do some work ...;
+    yield return item;
+});
+```
+
+流的实现处理了大量和通用的细节，确保流是尽可能高效的。一个关键的技术是流控，从 TCP 那边借鉴过来的。一个流的生产者和消费者完全在抽象的覆盖下合作，以确保管道不会变得非常不平衡。这很像 TCP 流控的工作方式，维护一个叫做窗口（window）的东西，并根据情况打开或关闭它。总的来说，这非常有效。例如，我们的实时多媒体栈有两个异步的管道，一个处理音频，另一个处理视频，并将它们合并在一起，以实现音频和视频的同步。通常，内置的留空机制就能让他们不掉帧。
+
+## “巨大”的挑战
