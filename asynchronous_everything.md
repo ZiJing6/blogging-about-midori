@@ -10,7 +10,7 @@ Midori 的异步编程模型表面上很像 C# 的 async/await。
 
 但我得超越自己。要进行一个很长的旅程才能接触到现在这点，让我们从最开始的地方启程吧。
 
-## Promises
+### Promises
 
 在我们异步模型的核心是一个叫 [promises](https://en.wikipedia.org/wiki/Futures_and_promises) 的技术。现在，这个概念已经相当普遍了。但就像等会你会看到的那样，我们使用 promises 的方式更有趣些。我们受 [E 系统](https://en.wikipedia.org/wiki/E_(programming_language))的影响很深。也许跟现在流行的大多数异步框架最大的不同是我们完全不玩虚的，在我们系统里面连一个同步的 API 都没有。
 
@@ -116,7 +116,7 @@ Promise<void> DoSomething(Promise<string> cmd) {
 
 根本不可能搞清楚会发生什么。很难知道这各种各样的 return 到底 return 到哪里，什么异常没有被处理，而且非常容易导致重复代码（例如上面的 error 分支），因为经典的代码块范围已经不适用了。上帝保佑，你需要的只是一个循环。而这正是一个磁盘驱动 —— 最需要可靠性的那块！
 
-## 进入 Async 和 Await
+### 进入 Async 和 Await
 
 [几乎](https://msdn.microsoft.com/en-us/library/hh156528.aspx)[每一个](http://tc39.github.io/ecmascript-asyncawait/)[重要的](https://www.python.org/dev/peps/pep-0492/)[语言](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4134.pdf)现在都具备类似 async 和/或 await 特性。而我们是从 2009 年开始大范围使用的。我说的大范围，那是真的大范围。
 
