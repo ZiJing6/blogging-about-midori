@@ -17,7 +17,7 @@
     4. [安全的本地代码](https://github.com/ZiJing6/blogging-about-midori/blob/master/safe_native_code.md) （未翻译）  
     5. [错误模型](https://github.com/ZiJing6/blogging-about-midori/blob/master/the_error_model.md) （未翻译）  
     6. [性能文化](https://github.com/ZiJing6/blogging-about-midori/blob/master/performance_culture.md) （未翻译）  
-    7. [为并发 15 年](https://github.com/ZiJing6/blogging-about-midori/blob/master/15_years_of_concurrency.md) （未翻译）  
+    7. [并发 15 年](https://github.com/ZiJing6/blogging-about-midori/blob/master/15_years_of_concurrency.md) （翻译中）  
 
 Midori 是一趟迷人的旅程，是我职业生涯里最开心的一段日子。我愿能够分享这旅程的一部分给你。 
 
