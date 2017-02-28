@@ -16,3 +16,15 @@
 
 一句话，它具有极大的挑战性，完全技术话事，所以充满了乐趣。
 
+我一直都是语言的沉迷者。因此我就自然地被学术界几十年深入的研究深深吸引，包括编程语言与运行时共生（特别是 [Cilk](https://en.wikipedia.org/wiki/Cilk) 和 [NESL](https://en.wikipedia.org/wiki/NESL)）、高级类型系统、以及甚至专门的并行硬件体系结构（特别激进的像[连接机（The Connection Machine）](https://en.wikipedia.org/wiki/Connection_Machine)，以及 [MIMD](https://en.wikipedia.org/wiki/MIMD) 超级计算机，那创新超越了我们可信赖的老伙伴[冯·诺依曼体系](https://en.wikipedia.org/wiki/Von_Neumann_architecture)）。
+
+虽然一些非常大的客户真的跑了[对称多处理器（SMP）](https://en.wikipedia.org/wiki/Symmetric_multiprocessing)服务器 —— 是的，我们事实上习惯这样叫它们 —— 我不会说并发是一个非常流行的专门领域。因此当然任何提及那些酷的带研究味的来源都会让我的同事和经理感觉怪怪的。尽管如此，我还是坚持了下去。
+
+尽管有乐趣，我不会说这个时期我们做的工作对随意的观察人员产生了巨大的影响。我们将抽象提高了一点 —— 以便开发者可以调度逻辑的工作项，考虑同步的更高级别等等 —— 但没有任何改变游戏规则的地方。然而，这段时期有助于为之后到来的那些奠定基础，无论是基础上还是社区上，尽管我那时候还不知道。
+
+### 不再有免费的午餐，进入多核
+
+然后一些重大的事情发生了。
+
+2004 年，Intel 和 AMD 告诉我们[摩尔定律](https://en.wikipedia.org/wiki/Moore's_law)，尤其是它的[接近终结](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.87.8775&rep=rep1&type=pdf)。[能量墙挑战](https://www.quora.com/Why-havent-CPU-clock-speeds-increased-in-the-last-5-years)会[严重削弱曾经一直增长的时钟速度改进](http://www.economist.com/technology-quarterly/2016-03-12/after-moores-law)，而那是工业界早已经习惯了的。
+
