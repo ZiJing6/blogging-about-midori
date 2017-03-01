@@ -28,3 +28,15 @@
 
 2004 年，Intel 和 AMD 告诉我们[摩尔定律](https://en.wikipedia.org/wiki/Moore's_law)，尤其是它的[接近终结](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.87.8775&rep=rep1&type=pdf)。[能量墙挑战](https://www.quora.com/Why-havent-CPU-clock-speeds-increased-in-the-last-5-years)会[严重削弱曾经一直增长的时钟速度改进](http://www.economist.com/technology-quarterly/2016-03-12/after-moores-law)，而那是工业界早已经习惯了的。
 
+突然，管理人员都变得非常关心并发问题。Herb Sutter 在 2005 年的[免费午餐结束了文章](http://www.gotw.ca/publications/concurrency-ddj.htm)中记录了这狂热的投入。如果我们不能让开发者可以编写大量的并行软件 —— 这在历史上是非常困难而且几乎并且不太可能在没有显著降低进入门槛的情况下发生的事 —— 微软和英特尔的业务以及互利互惠的业务模式，都会遇到麻烦。如果硬件不会像往常那样变得更快，软件也不会自动变得更好，人们就没有理由去购买新的硬件和软件。[Wintel](https://en.wikipedia.org/wiki/Wintel) 时代和[安迪·比尔盖茨定律](http://www.forbes.com/2005/04/19/cz_rk_0419karlgaard.html)就结束了，“安迪给多少，比尔盖茨就拿走多少”。
+
+或者，顺着这样想下去。
+
+这是“多核”这个词闯入主流的时候，而我们开始设想一个拥有 1024 核处理器或者更前瞻的从[数字信号处理器（DSP）](https://en.wikipedia.org/wiki/Digital_signal_processor)借鉴而来的[“非常多核”架构](https://en.wikipedia.org/wiki/Manycore_processor)的世界，混合了通用和专用的核心，能够承载非常重负荷的功能，例如加密、压缩等等。
+
+另一方面，过了 10 年再回来看，事情并没有完全按照我们设想的那样演变。我们并没有用 1024 个传统的核来跑 PC，虽然[我们的 GPU 已经远超过了这个数](http://www.geforce.com/hardware/10series/titan-x-pascal)，而且我们的确看到了跟以前更多的异构性，特别是数据中心中，在那里 [FPGA 现在负担起大量的关键任务，像加密和压缩](https://www.wired.com/2016/09/microsoft-bets-future-chip-reprogram-fly/)。
+
+在我看来，真正大的错失是移动端。恰恰是当思考能量曲线、密度和异构时，应该能告知我们移动是迫在眉睫的，而且是很大的一块。与其寻求更强大的 PC，我们应该去寻求我们口袋里的 PC。相反，我们自然的本能是抓住过去，“拯救” PC 业务。这是一个经典的[创新者的困境](https://en.wikipedia.org/wiki/The_Innovator's_Dilemma)，虽然在当时当然看起来不像。当然 PC 并没有在一夜间死亡，所以这里的创新也没有浪费，只是在历史的背景下让人感到不平衡。不好意思，我跑题了。
+
+## 使并发更容易
+
