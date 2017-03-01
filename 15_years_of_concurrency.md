@@ -28,7 +28,7 @@
 
 2004 年，Intel 和 AMD 告诉我们[摩尔定律](https://en.wikipedia.org/wiki/Moore's_law)，尤其是它的[接近终结](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.87.8775&rep=rep1&type=pdf)。[能量墙挑战](https://www.quora.com/Why-havent-CPU-clock-speeds-increased-in-the-last-5-years)会[严重削弱曾经一直增长的时钟速度改进](http://www.economist.com/technology-quarterly/2016-03-12/after-moores-law)，而那是工业界早已经习惯了的。
 
-突然，管理人员都变得非常关心并发问题。Herb Sutter 在 2005 年的[免费午餐结束了文章](http://www.gotw.ca/publications/concurrency-ddj.htm)中记录了这狂热的投入。如果我们不能让开发者可以编写大量的并行软件 —— 这在历史上是非常困难而且几乎并且不太可能在没有显著降低进入门槛的情况下发生的事 —— 微软和英特尔的业务以及互利互惠的业务模式，都会遇到麻烦。如果硬件不会像往常那样变得更快，软件也不会自动变得更好，人们就没有理由去购买新的硬件和软件。[Wintel](https://en.wikipedia.org/wiki/Wintel) 时代和[安迪·比尔盖茨定律](http://www.forbes.com/2005/04/19/cz_rk_0419karlgaard.html)就结束了，“安迪给多少，比尔盖茨就拿走多少”。
+突然，管理人员都变得非常关心并发问题。Herb Sutter 在 2005 年的[免费午餐结束了文章](http://www.gotw.ca/publications/concurrency-ddj.htm)中记录了这狂热的投入。如果我们不能让开发者可以编写大量的并行软件 —— 这在历史上是非常困难而且几乎并且不太可能在没有显著降低进入门槛的情况下发生的事 —— 微软和英特尔的业务以及互利互惠的业务模式，都会遇到麻烦。如果硬件不会像往常那样变得更快，软件也不会自动变得更好，人们就没有理由去购买新的硬件和软件。[Wintel](https://en.wikipedia.org/wiki/Wintel) 时代和[安迪·比尔盖茨定律](http://www.forbes.com/2005/04/19/cz_rk_0419karlgaard.html)就结束了，*“安迪给多少，比尔盖茨就拿走多少”*。
 
 或者，顺着这样想下去。
 
