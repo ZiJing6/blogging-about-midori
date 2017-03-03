@@ -54,3 +54,21 @@
 
 ### 软件事务内存
 
+具有讽刺意味的是，我们首先从安全开始。这预示着后面的故事，因为通常来说，安全是非常靠后的东西，知道我在 Midori 的背景下将它重新捡回来。
+
+开发者已经有好几种引入并发的机制，并且仍然在努力地想写出正确的代码。因此我们寻求那些更高层次的好像能够意外地使正确性成为可能的抽象。
+
+进入[软件事务内存(STM)](https://en.wikipedia.org/wiki/Transactional_memory)。自从 [Herlihy 和 Moss 开创性的 1993 年的论文](https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-895-theory-of-parallel-systems-sma-5509-fall-2003/readings/herlihy_mo93.pdf)以来，大量有希望的研究已经问世，尽管这不是万能妙药，但我们中的很多人已经迷上了它的能够提高抽象层次的能力。
+
+STM 让你像下面这样写东西，就能得到自动的安全：
+
+```csharp
+void Transfer(Account from, Account to, int amt) {
+    atomic {
+        from.Withdraw(amt);
+        to.Deposit(amt);
+    }
+}
+```
+
+看哪！没有锁！
