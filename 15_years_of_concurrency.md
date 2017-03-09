@@ -82,3 +82,28 @@ STM 还附带了易用的，更声明式的协调机制，例如 [orElse](https:
 然而，我们的 STM 努力也并不是完全失败。正式这段时间，我开始尝试使用类型系统来实现安全并发。此外，这些零碎的东西最终被整合进了 Intel 的 Haswell 处理器，作为[事务同步扩展(Transactional Synchronization Extensions(TSX))](https://en.wikipedia.org/wiki/Transactional_Synchronization_Extensions)指令集，带来了使用[推测性锁省略](http://citeseer.ist.psu.edu/viewdoc/download;jsessionid=496F867855F76185B4C1EA3195D42F8C?doi=10.1.1.136.1312&rep=rep1&type=pdf)方法实现超低成本的同步和锁操作的能力。而且再一次，这段时期，我又跟一些神奇的了不起的人在一起工作。
 
 ### 并发语言集成查询(PLINQ)
+
+在 STM 之余，我还在晚上和周末搞着一个“臭鼬工程”数据并行框架，利用了我们最近在[语言集成查询(LINQ)](https://en.wikipedia.org/wiki/Language_Integrated_Query)中的工作成果。
+
+并行 LINQ(PLINQ) 背后的想法是从三个研究得很好的领域偷了一页过来：
+
+1. [并行数据库](https://en.wikipedia.org/wiki/Parallel_database)，它们已经能够[基于用户的行为并行 SQL 查询](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.21.2197&rep=rep1&type=pdf)，并且用户不需要知道发生了什么，经常带来非常惊人的结果。
+
+2. 声明式和函数式语言，它们经常使用 [列表推导式(list comprehension)](https://en.wikipedia.org/wiki/List_comprehension) 来表达更高级别的能被更积极地优化的语言操作，包括并行。为此，我加深了我对 [Haskell](https://wiki.haskell.org/GHC/Data_Parallel_Haskell) 的痴迷，并从 [APL](https://en.wikipedia.org/wiki/APL_(programming_language)) 中得到了启发。
+
+3. 数据并行，在[学术界有相当长的历史](https://en.wikipedia.org/wiki/Data_parallelism)了，甚至有更多的主流典型，最著名的是 [OpenMP](https://en.wikipedia.org/wiki/OpenMP)
+
+这想法相当直接。将已有的 LINQ 查询拿过来，它们都已经包含了映射、过滤和聚集之类的操作 —— 这些在语言里和数据库里都是经典的可并行的东西 —— 并自动并行它们。当然，这不能是隐式的，因为有副作用。但所有的这些只需要一个小小的 AsParallel 就能启用起来了。
+
+```csharp
+// Sequential:
+var q = (from x in xs
+         where p(x)
+         select f(x)).Sum();
+
+// Parallel:
+var q = (from x in xs.AsParallel()
+         where p(x)
+         select f(x)).Sum();
+```
+
