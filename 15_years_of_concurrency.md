@@ -79,7 +79,7 @@ STM 还附带了易用的，更声明式的协调机制，例如 [orElse](https:
 
 不幸的是，经过几年的深度运行时、操作系统甚至硬件支持原型之后，我们放弃了这方面的努力。我简要的总结是，鼓励良好的并发体系比糟糕的“仅仅能用”的并发体系更重要，虽然我已经在[这里](http://joeduffyblog.com/2010/01/03/a-brief-retrospective-on-transactional-memory/)和[这里](http://joeduffyblog.com/2010/05/16/more-thoughts-on-transactional-memory/)写了更多的细节。我们应该首先关注和解决一个更高层次的架构，在尘埃落定之后，再回来看看剩下的差距在那里。一旦我们达成了那个目标，STM 是否还是正确的工具仍未可知。（事后诸葛亮：我的确认为它是工具架中很多非常合理工具中的一个，尽管随着更多的分布式应用架构在增加，将[它交给人们是危险的](http://wiki.c2.com/?DistributedTransactionsAreEvil)。）
 
-然而，我们的 STM 努力也并不是完全失败。正式这段时间，我开始尝试使用类型系统来实现安全并发。此外，这些零碎的东西最终被整合进了 Intel 的 Haswell 处理器，作为[事务同步扩展(Transactional Synchronization Extensions(TSX))](https://en.wikipedia.org/wiki/Transactional_Synchronization_Extensions)指令集，带来了使用[推测性锁省略](http://citeseer.ist.psu.edu/viewdoc/download;jsessionid=496F867855F76185B4C1EA3195D42F8C?doi=10.1.1.136.1312&rep=rep1&type=pdf)方法实现超低成本的同步和锁操作的能力。而且再一次，这段时期，我又跟一些神奇的了不起的人在一起工作。
+然而，我们的 STM 努力也并不是完全失败。正式这段时间，我开始尝试使用类型系统来实现安全并发。此外，这些零碎的东西最终被整合进了 Intel 的 Haswell 处理器，作为[事务同步扩展(Transactional Synchronization Extensions(TSX))](https://en.wikipedia.org/wiki/Transactional_Synchronization_Extensions)指令集，带来了使用[投机锁省略（speculative lock elision）](http://citeseer.ist.psu.edu/viewdoc/download;jsessionid=496F867855F76185B4C1EA3195D42F8C?doi=10.1.1.136.1312&rep=rep1&type=pdf)方法实现超低成本的同步和锁操作的能力。而且再一次，这段时期，我又跟一些神奇的了不起的人在一起工作。
 
 ### 并发语言集成查询(PLINQ)
 
