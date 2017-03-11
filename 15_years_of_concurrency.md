@@ -107,3 +107,23 @@ var q = (from x in xs.AsParallel()
          select f(x)).Sum();
 ```
 
+这 demo 了数据并行的一个很棒的方面，它能根据你输入的规模进行扩展，不管是数据量还是操作数据的花销，即使是两者一起，都行。当用足够高层次的语言，像 LINQ 来表达时，开发人员不必操心调度、选择正确的任务数量、同步之类的东西。
+
+这本质上是在同一台机器上，跨越了多个处理器的 [MapReduce](https://en.wikipedia.org/wiki/MapReduce)。事实上，我们后来跟微软研究中心（MSR）在一个名为 [DryadLINQ](https://www.microsoft.com/en-us/research/project/dryadlinq/) 的项目上协作，它不仅在多个处理器上运行这些查询，还可以在很多机器上分布式执行它们。（最终我们甚至使用了 SIMD 和 GPGPU 实现了更细粒度的调度。）最终生成了微软自家的跟 MapReduce 一样的东西 —— [Cosmos](https://www.quora.com/Distributed-Systems-What-is-Microsofts-Cosmos)，这是一个今时今日还为微软提供很多大数据创新的系统。
+
+开发 PLINQ 是我职业生涯的一段美好时光，也是一个真正的转折点。我跟一些了不起的人建立了合作关系。盖茨给这想法写了一整页的评论，以“我们必须特别为这项工作投入更多的资源”来总结。由于发展资金的投入，这种强烈的激励言辞并没带来什么伤害。它也引起了一些难以置信的人的注意。例如，[Jim Gray](https://en.wikipedia.org/wiki/Jim_Gray_(computer_scientist)) 就注意到了，我不得不亲身体验他臭名昭著的慷慨相助，就在他不幸消失的两个月前。
+
+不用说，这是个激动人心的时期！
+
+### 插曲：形成 PFX 团队
+
+这个时候，我决定扩大我们的工作范围，不仅仅是数据并行，还要处理任务并行和其他的并发抽象。因此我四处推销成立一个新团队的想法。
+
+令我惊奇的是，开发平台事业部正在创建一个新的并行计算组，以响应不断变化的技术环境，他们希望赞助这些项目。这是一个机会，在一个很棒的业务主题下将所有这些整合起来，统一招募努力，将东西推得更远，最终分散到 C++、GPGPU 和其他之中。
+
+所以，很明显地，我说了 yes。
+
+我将团队命名为“[PFX](https://en.wikipedia.org/wiki/Parallel_Extensions)”，最初是“parallel frameworks”的缩写，虽然在我们发布的时候，市场展示了它的魔力，将它重命名为“Parallel Extensions to .NET”。团队的初始交付包含了 PLINQ、任务并行（task parallelism）和一批新的协作数据结构（Coordination Data Structures（CDS）），旨在处理高级同步工作，像[屏障方式（barrier-style）的同步](https://en.wikipedia.org/wiki/Barrier_(computer_science))、来源于[许多优秀研究论文](http://cs.rochester.edu/u/scott/papers/1995_TR600.pdf)的[无锁并发集合](https://github.com/dotnet/corefx/tree/master/src/System.Collections.Concurrent/src/System/Collections/Concurrent)等等。
+
+### 任务并行库（Task Parallel Library）
+
