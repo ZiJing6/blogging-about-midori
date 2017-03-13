@@ -38,7 +38,7 @@
 
 在我看来，真正大的错失是移动端。恰恰是当思考能量曲线、密度和异构时，应该能告知我们移动是迫在眉睫的，而且是很大的一块。与其寻求更强大的 PC，我们应该去寻求我们口袋里的 PC。相反，我们自然的本能是抓住过去，“拯救” PC 业务。这是一个经典的[创新者的困境](https://en.wikipedia.org/wiki/The_Innovator's_Dilemma)，虽然在当时当然看起来不像。当然 PC 并没有在一夜间死亡，所以这里的创新也没有浪费，只是在历史的背景下让人感到不平衡。不好意思，我跑题了。
 
-## 使并发更容易
+### 使并发更容易
 
 作为一个并发 geek，这就是我一直等待的时刻。几乎一夜之间，为所有这些我一直梦想的创新工作寻找赞助商变得相当容易，因为现在它有了一个真正的非常迫切的业务需要。
 
@@ -52,7 +52,7 @@
 
 三个特定的项目围绕这个点孵化了出来，并受到了兴趣和人员配置的激励。
 
-### 软件事务内存
+#### 软件事务内存
 
 具有讽刺意味的是，我们首先从安全开始。这预示着后面的故事，因为通常来说，安全是非常靠后的东西，知道我在 Midori 的背景下将它重新捡回来。
 
@@ -81,7 +81,7 @@ STM 还附带了易用的，更声明式的协调机制，例如 [orElse](https:
 
 然而，我们的 STM 努力也并不是完全失败。正式这段时间，我开始尝试使用类型系统来实现安全并发。此外，这些零碎的东西最终被整合进了 Intel 的 Haswell 处理器，作为[事务同步扩展(Transactional Synchronization Extensions(TSX))](https://en.wikipedia.org/wiki/Transactional_Synchronization_Extensions)指令集，带来了使用[投机锁省略（speculative lock elision）](http://citeseer.ist.psu.edu/viewdoc/download;jsessionid=496F867855F76185B4C1EA3195D42F8C?doi=10.1.1.136.1312&rep=rep1&type=pdf)方法实现超低成本的同步和锁操作的能力。而且再一次，这段时期，我又跟一些神奇的了不起的人在一起工作。
 
-### 并发语言集成查询(PLINQ)
+#### 并发语言集成查询(PLINQ)
 
 在 STM 之余，我还在晚上和周末搞着一个“臭鼬工程”数据并行框架，利用了我们最近在[语言集成查询(LINQ)](https://en.wikipedia.org/wiki/Language_Integrated_Query)中的工作成果。
 
@@ -115,7 +115,7 @@ var q = (from x in xs.AsParallel()
 
 不用说，这是个激动人心的时期！
 
-### 插曲：形成 PFX 团队
+#### 插曲：形成 PFX 团队
 
 这个时候，我决定扩大我们的工作范围，不仅仅是数据并行，还要处理任务并行和其他的并发抽象。因此我四处推销成立一个新团队的想法。
 
@@ -123,13 +123,31 @@ var q = (from x in xs.AsParallel()
 
 所以，很明显地，我说了 yes。
 
-我将团队命名为“[PFX](https://en.wikipedia.org/wiki/Parallel_Extensions)”，最初是“parallel frameworks”的缩写，虽然在我们发布的时候，市场展示了它的魔力，将它重命名为“Parallel Extensions to .NET”。团队的初始交付包含了 PLINQ、任务并行（task parallelism）和一批新的协作数据结构（Coordination Data Structures（CDS）），旨在处理高级同步工作，像[屏障方式（barrier-style）的同步](https://en.wikipedia.org/wiki/Barrier_(computer_science))、来源于[许多优秀研究论文](http://cs.rochester.edu/u/scott/papers/1995_TR600.pdf)的[无锁并发集合](https://github.com/dotnet/corefx/tree/master/src/System.Collections.Concurrent/src/System/Collections/Concurrent)等等。
+我将团队命名为“[PFX](https://en.wikipedia.org/wiki/Parallel_Extensions)”，最初是“parallel frameworks”的缩写，虽然在我们发布的时候，市场展示了它的魔力，将它重命名为“Parallel Extensions to .NET”。团队的初始交付包含了 PLINQ、任务并行（task parallelism）和一批新的协作数据结构（Coordination Data Structures（CDS）），旨在处理高级同步工作，像[屏障风格（barrier-style）的同步](https://en.wikipedia.org/wiki/Barrier_(computer_science))、来源于[许多优秀研究论文](http://cs.rochester.edu/u/scott/papers/1995_TR600.pdf)的[无锁并发集合](https://github.com/dotnet/corefx/tree/master/src/System.Collections.Concurrent/src/System/Collections/Concurrent)等等。
 
-### 任务并行库（Task Parallel Library）
+#### 任务并行库（Task Parallel Library）
 
 这将我带到了任务并行。
 
 作为 PLINQ 的一部分，我们需要创建自己的并行“任务”的概念。我们需要一个精巧的调度器，能够根据给出的机器可用资源自动扩展。大多数已有的调度器是类线程池的，在里面它们要求每个任务跑在单独的线程上面，即使那样做是无益的。并且在其中将任务映射到线程是相当初级的，虽然[我们在那几年中已经对这做了改进](http://www.sigmetrics.org/conferences/sigmetrics/2009/workshops/papers_hotmetrics/session2_2.pdf)。
 
 鉴于我对 Cilk 的热爱，还有调度大量存在递归可能的细粒度任务的需要，为我们的调度架构选择一个[工作偷取调度器](https://en.wikipedia.org/wiki/Work_stealing)是不假思索的事。
+
+起初，我们的目光完全被锁在 PLINQ 的一亩三分地上，所以我们没有花多少精力在抽象上。然后 MSR 开始探索一个独立的任务并行库会是什么样的。这是一个完美的合作机会，所以我们开始一起构建一些东西。Task&lt;T> 抽象诞生了，我们重写了 PLINQ 来使用它，并为常见的模式创建了一套[并行 API](https://msdn.microsoft.com/en-us/library/system.threading.tasks.parallel(v=vs.110).aspx)，例如 fork/join 和 并行的 for 和 foreach 循环。
+
+在发布之前，我们将线程池的核心替换成了我们全新闪亮的工作窃取调度器，在进程中引入统一的资源管理，一边多个调度器不会互相争斗。直到现在，代码几乎还跟我当初支持 PLINQ 的实现一样（当然还有很多的 bug 修复和改进）。
+
+我们长期以来真的对相对小的 API 的易用性非常着紧。虽然我们犯过错误，但事后看来我还是很满意我们这样做了。我们直觉觉得 Task&lt;T> 会是我们在并行空间做的一切的核心，但没人料到如此广泛的使用，作为这些年来非常流行的异步编程。现在，它给 async 和 await 充满了力量，而我再也无法想象没有 Task&lt;T> 的生活。
+
+#### 做个广告：来自 Java 的启示
+
+如果我没有提到 Java，以及它对我自己想法的影响，那将是我的疏忽。
+
+为此，我们在 Java 社区的邻居也开始做一些创新工作，Doug Lea 领队，也收到了同样的学术来源的启发。Doug 在 1999 年的书[《Java 并发编程》](http://gee.cs.oswego.edu/dl/cpj/index.html)帮助在主流中推广这些思想，最终引致将 [JSR 166](https://jcp.org/en/jsr/detail?id=166) 纳入到 JDK 5.0 中。同时，Java 的内存模型也根据 [JSR 133](https://jcp.org/en/jsr/detail?id=133) 形式化，这是无锁数据结构的一个关键的基础，这是扩展到大量处理器时必需的。
+
+他做的是我见到的第一次主流的尝试，在线程、锁和事件之上提升抽象级别成为更容易接受的东西：并发集合、[fork/join](http://gee.cs.oswego.edu/dl/papers/fj.pdf) 等等。这也使工业界更接近学术界的漂亮的并发编程语言。这些努力对我们产生了巨大的影响。我特别赞赏学术界和工业界如何密切合作，将数十年来的知识财富带到桌面上，并明确寻求在今后的几年中都[效仿](http://www.cs.washington.edu/events/colloquia/search/details?id=768)这种做法。
+
+不用说，考虑到 .NET 和 Java 之间的相似性，以及竞争的级别，我们深受启发。
+
+### 噢！安全，你在哪里？
 
