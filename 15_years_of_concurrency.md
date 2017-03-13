@@ -131,5 +131,5 @@ var q = (from x in xs.AsParallel()
 
 作为 PLINQ 的一部分，我们需要创建自己的并行“任务”的概念。我们需要一个精巧的调度器，能够根据给出的机器可用资源自动扩展。大多数已有的调度器是类线程池的，在里面它们要求每个任务跑在单独的线程上面，即使那样做是无益的。并且在其中将任务映射到线程是相当初级的，虽然[我们在那几年中已经对这做了改进](http://www.sigmetrics.org/conferences/sigmetrics/2009/workshops/papers_hotmetrics/session2_2.pdf)。
 
-鉴于我对 Cilk 的热爱，还有调度大量存在递归可能的细粒度任务的需要，为我们的调度架构选择一个[工作偷取调度器](https://en.wikipedia.org/wiki/Work_stealing)是完全不用想的。
+鉴于我对 Cilk 的热爱，还有调度大量存在递归可能的细粒度任务的需要，为我们的调度架构选择一个[工作偷取调度器](https://en.wikipedia.org/wiki/Work_stealing)是不假思索的事。
 
