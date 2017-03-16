@@ -186,3 +186,19 @@ Bill 再次下结论：“我们需要搞这个。”所以我滚去开工了！
 
 为了得到这些结论，我们深受 [Hoare 的通信顺序进程（CSP）](https://en.wikipedia.org/wiki/Communicating_sequential_processes)，Gul Agha 和 Carl Hewitt 在 [Actors](https://en.wikipedia.org/wiki/Actor_model)、[E](https://en.wikipedia.org/wiki/E_(programming_language))、[π](https://en.wikipedia.org/wiki/%CE%A0-calculus) 和 [Erlang](https://en.wikipedia.org/wiki/Erlang_(programming_language)) 上的工作，还有我们自己这些年来在开发并发、分布式的各种基于 RPC 的系统的共同经验的启发。
 
+之前我没说过，但在我之前在 PFX 的工作中，消息传递明显是缺席的。有多方面的原因。首先，是有很多与之竞赛的成果，但没有一个“感觉”对头的。例如，[并发和协调运行时（Concurrency and Coordination Runtime(CCR)）](https://en.wikipedia.org/wiki/Concurrency_and_Coordination_Runtime)非常复杂（但有很多满意的客户）；Axum 语言，呃，一种新的语言；MSR 的 [Cω](http://research.microsoft.com/en-us/um/cambridge/projects/comega/) 很强大，但需要语言的变化，让人不禁犹豫要不要追一下（虽然派生出了只需要库的工作，还有[牛人加入](http://research.microsoft.com/en-us/um/people/crusso/joins/)，有了一些保障）；等等。另外，每个人似乎对基本的概念应该是怎么样的都有不同的想法，它没有带来什么帮助。
+
+但这归根到底都是隔离。对于我们认为很有必要用来提供安全、无处不在且容易的消息传递的细粒度隔离，Windows 进程太重量级了。而且 Windows 上没有适合这种任务的子进程隔离技术：[COM apartments](https://en.wikipedia.org/wiki/Component_Object_Model#Threading)、CLR AppDomain …… 许多有缺陷的尝试立刻涌上心头；坦白说，我真不愿挂在那座山上。
+
+（在那之后，我得说明，有了一些很不错的成果，像 [Orleans](https://github.com/dotnet/orleans) —— 某种程度是由一些前 Midori 成员构建的 —— [TPL Dataflow](https://msdn.microsoft.com/en-us/library/hh228603(v=vs.110).aspx)，还有 [Akka.NET](http://getakka.net/)，如果你现在想在 .NET 搞 actor 和/或 消息传递，我推荐你去尝试下它们。）
+
+另一方面，Midori 拥抱多级别的隔离，从由于软件隔离，比 Windows 的线程还要轻量的进程开始。更粗粒度的隔离也是可行的，以域（domains）的形式，再加上对不受信任或逻辑上分离的代码托管的硬件保护双保险。在早期的日子里，我们当然也希望能达到更细的粒度 —— 受 [E 的 vats 概念](http://www.erights.org/elib/concurrency/vat.html)的启发，对于进程消息泵我们已经开始这种抽象了 —— 但不确信如何才能安全地实现它。所以我们在这里停下来等待。但这正好给了我们对于鲁棒、高性能和安全的消息传递基础所需要的。
+
+对这种架构的讨论中重要的是[无共享（shared nothing）](https://en.wikipedia.org/wiki/Shared_nothing_architecture)的概念，这是 Midori 作为核心的操作原则。无共享架构对可靠性、消除单点故障非常有用，但它们对并发安全也同样有用。如果你不共享任何东西，那就不会有机会具备竞争条件！（这有点撒谎，通常情况下还是不充分的，我们迟点会看到。）
+
+有意思的是，在我们跟这些扭打在一起的时候，Node.js 也正在开发。异步、无阻塞、进程范围的单个事件循环的核心思想是非常相似的。也许 2007 到 2009 之间空气中飘散着甜美的味道。事实上，许多这样的特性在[事件循环并发](https://en.wikipedia.org/wiki/Event_loop)中是很常见的。
+
+这形成了整个并发模型绘制于其上的画卷。我已经在[异步一切](https://github.com/ZiJing6/blogging-about-midori/blob/master/asynchronous_everything.md)文章中讨论了这点。但这里还有更多……
+
+### 为什么不在这里停下来呢？
+
