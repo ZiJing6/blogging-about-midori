@@ -73,7 +73,7 @@ void Transfer(Account from, Account to, int amt) {
 
 看哪！没有锁！
 
-STM 能透明地处理所有的决策，例如了解使用多粗或多细粒度的同步、针对同步的争用策略、死锁检测及预防、并保证当你访问共享数据结构时不会忘记锁定。所有的这些都藏在一个简单的关键字背后：atomic。
+STM 能透明地处理所有的决策，例如了解使用多粗或多细粒度的同步、针对同步的竞争策略、死锁检测及预防、并保证当你访问共享数据结构时不会忘记锁定。所有的这些都藏在一个简单的关键字背后：atomic。
 
 STM 还附带了易用的，更声明式的协调机制，例如 [orElse](https://hackage.haskell.org/package/stm-2.4.4.1/docs/Control-Monad-STM.html#v:orElse)。因此，尽管重点在于消除手动管理锁定的需要，它还有助于在线程间实现同步。
 
@@ -161,7 +161,7 @@ Bill 再次下结论：“我们需要搞这个。”所以我滚去开工了！
 
 ## 你好，Midori
 
-但仍然有一个巨大的问题。我无法想象在现有的语言和运行时中逐步地完成这项工作。我不是在寻找一个温暖舒适的近似安全，而是一种这样的东西：如果你程序被编译通过了，你就知道它是没有数据争用的。它是要刀枪不入的。
+但仍然有一个巨大的问题。我无法想象在现有的语言和运行时中逐步地完成这项工作。我不是在寻找一个温暖舒适的近似安全，而是一种这样的东西：如果你程序被编译通过了，你就知道它是没有数据竞争的。它是要刀枪不入的。
 
 事实上，我试过了。我用 C# 的自定义 attribute 和静态分析做了这个系统的变体的原型，但很快就能做出推论，问题深深植根在语言中，要让这想法的任何部分正确工作起来，必须将它集成到类型系统里。而且它们还可能被远程调用。虽然当时我们有一些有趣的孵化项目（像 [Axum](https://en.wikipedia.org/wiki/Axum_(programming_language))），但考虑到愿景的范围，以及文化和技术原因，我知道这项工作需要一个新的家。
 
@@ -183,4 +183,6 @@ Bill 再次下结论：“我们需要搞这个。”所以我滚去开工了！
     * 同步阻塞是不允许的。
     * 所有在系统中的异步活动是显式的。
     * 复杂的协调模式是可行的，无需凭借锁和事件。
+
+为了得到这些结论，我们深受 [Hoare 的通信顺序进程（CSP）](https://en.wikipedia.org/wiki/Communicating_sequential_processes)，Gul Agha 和 Carl Hewitt 在 [Actors](https://en.wikipedia.org/wiki/Actor_model)、[E](https://en.wikipedia.org/wiki/E_(programming_language))、[π](https://en.wikipedia.org/wiki/%CE%A0-calculus) 和 [Erlang](https://en.wikipedia.org/wiki/Erlang_(programming_language)) 上的工作，还有我们自己这些年来在开发并发、分布式的各种基于 RPC 的系统的共同经验的启发。
 
