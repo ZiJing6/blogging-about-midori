@@ -253,5 +253,5 @@ readonly Foo r2 = i; // ok; still cannot be mutated by this reference.
 r2.Field++; // error: cannot mutate a readonly object.
 ```
 
-这些保证是由编译器强制执行的，并必须经过[验证](https://en.wikipedia.org/wiki/Typed_assembly_language)。
+这些保证是由编译器强制执行的，且必须经过[验证](https://en.wikipedia.org/wiki/Typed_assembly_language)。
 
