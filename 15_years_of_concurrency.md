@@ -255,3 +255,32 @@ r2.Field++; // error: cannot mutate a readonly object.
 
 这些保证是由编译器强制执行的，且必须经过[验证](https://en.wikipedia.org/wiki/Typed_assembly_language)。
 
+默认情况下，如果没有特别声明，int、string 等基元类型是不可变的，而所有的其他类型是可变的。这在几乎所有的情况下保留了现有的 C# 语义。（也就是，C# 编译器没有做什么特别的改变。）这是有争议的，但实际上是系统的一个很酷的方面。它有争议，是因为最小授权原则将导致你应该选择 readonly 作为默认。它酷，是因为你能够采用任何 C# 代码，并开始点滴在有价值的地方增加许可。如果我们决定更激进地与 C# 决裂 —— 回头看来我们应该这样做 —— 那么打破兼容性，选择更安全的默认项是个正确的选择；但对于我们规定的 C# 兼容性目标，我想我们做出了正确的决定。
+
+这些许可也能作用在方法上，以指示这参数该如何使用：
+
+```csharp
+class List<T> {
+    void Add(T e);
+    int IndexOf(T e) readonly;
+    T this[int i] { readonly get; set; }
+}
+```
+
+调用者需要足够的许可来调用一个方法：
+
+```csharp
+readonly List<Foo> foos = ...;
+foos[0] = new Foo(); // error: cannot mutate a readonly object.
+```
+
+可以使用委托类型和 lambda 来声明类似的东西，例如：
+
+```csharp
+delegate void PureFunc<T>() immutable;
+```
+
+这意味着符合 PureFunc 接口的 lambda 表达式只能闭合（close over）不变的状态。
+
+请注意这突然变得多么强大！这个 PureFunc 正是我们并行任务想要的。正如我们一会儿会看到的，仅仅这些简单的概念就足以使很多那些 PFX 抽象变得安全。
+
