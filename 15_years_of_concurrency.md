@@ -218,6 +218,40 @@ Bill 再次下结论：“我们需要搞这个。”所以我滚去开工了！
 
 我们回到学术界和 ThinkWeek 的论文中寻找灵感。这些方法，如果以一种雅致的方式结合起来，似乎能给我们提供必要的工具，不仅提供安全的任务和数据并行，而且还提供更细粒度的隔离、不变性和工具，以至有可能解决一些进程内的竞争条件。
 
-所以我们 fork 了一份 C# 的编译器，来到了工场。
+所以我们 fork 了一份 C# 的编译器，来到了工地。
 
 ### 模型
+
+在这节，我会重新有点失序地（适当地）安排故事。首先我会介绍我们花了几年功夫最终完成的系统的样子，用“教程风格”，而不是从我们如何完成的少混乱的历史开始。我希望这能给出对系统更加简明的了解。然后，我会给出完整的历史账目，包括在深深触动我们的那个出现之前的几十个系统，
+
+我们从 C# 的类型系统开始，并加入了两个关键的慨念：许可（permission）和所有权（ownership）。
+
+#### 许可
+
+第一个关键的概念是*许可*。
+
+任何一个引用都可以有一个许可，而它管理了你能对这个引用对象干什么：
+
+* mutable（可变）：目标对象（图）能够通过平常的方式变更。
+* readonly（只读）：目标对象（图）能被读取但不能被变更。
+* immutable（不可变）：目标对象（图）能被读取并且*永远都不会*被变更。
+
+一个[子类型关系](https://en.wikipedia.org/wiki/Subtyping)意味着你能够隐式将 mutable 或 immutable 转换为 readonly。换句话说，mutable &lt;: readonly 和 immutable &lt;: readonly。
+
+例如：
+
+```csharp
+Foo m = new Foo(); // mutable by default.
+
+immutable Foo i = new Foo(); // cannot ever be mutated.
+i.Field++; // error: cannot mutate an immutable object.
+
+readonly Foo r1 = m; // ok; cannot be mutated by this reference.
+r1.Field++; // error: cannot mutate a readonly object.
+
+readonly Foo r2 = i; // ok; still cannot be mutated by this reference.
+r2.Field++; // error: cannot mutate a readonly object.
+```
+
+这些保证是由编译器强制执行的，并必须经过[验证](https://en.wikipedia.org/wiki/Typed_assembly_language)。
+
