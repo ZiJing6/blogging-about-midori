@@ -255,7 +255,7 @@ r2.Field++; // error: cannot mutate a readonly object.
 
 这些保证是由编译器强制执行的，且必须经过[验证](https://en.wikipedia.org/wiki/Typed_assembly_language)。
 
-默认情况下，如果没有特别声明，int、string 等基元类型是不可变的，而所有的其他类型是可变的。这在几乎所有的情况下保留了现有的 C# 语义。（也就是，C# 编译器没有做什么特别的改变。）这是有争议的，但实际上是系统的一个很酷的方面。它有争议，是因为最小授权原则将导致你应该选择 readonly 作为默认。它酷，是因为你能够采用任何 C# 代码，并开始点滴在有价值的地方增加许可。如果我们决定更激进地与 C# 决裂 —— 回头看来我们应该这样做 —— 那么打破兼容性，选择更安全的默认项是个正确的选择；但对于我们规定的 C# 兼容性目标，我想我们做出了正确的决定。
+默认情况下，如果没有特别声明，int、string 等基元类型是不可变的，而所有的其他类型是可变的。这在几乎所有的情况下保留了现有的 C# 语义。（也就是，C# 编译器没有做什么特别的改变。）这是有争议的，但实际上是系统的一个很酷的方面。它有争议，是因为最小授权原则将导致你应该选择 readonly 作为默认。它酷，是因为你能够采用任何 C# 代码，并开始在有价值的地方点滴增加许可。如果我们决定更激进地与 C# 决裂 —— 回头看来我们应该这样做 —— 那么打破兼容性，选择更安全的默认项是个正确的选择；但对于我们规定的 C# 兼容性目标，我想我们做出了正确的决定。
 
 这些许可也能作用在方法上，以指示这参数该如何使用：
 
@@ -283,4 +283,38 @@ delegate void PureFunc<T>() immutable;
 这意味着符合 PureFunc 接口的 lambda 表达式只能闭合（close over）不变的状态。
 
 请注意这突然变得多么强大！这个 PureFunc 正是我们并行任务想要的。正如我们一会儿会看到的，仅仅这些简单的概念就足以使很多那些 PFX 抽象变得安全。
+
+默认情况下，许可是“深（deep）”的，这样它们就可以应用到能达到的整个对象图。这与泛型的相互作用是显而易见的，然而，为了你能够，举个例子，结合深和浅的许可：
+
+```csharp
+readonly List<Foo> foos = ...;             // a readonly list of mutable Foos.
+readonly List<readonly Foo> foos = ...;    // a readonly list of readonly Foos.
+immutable List<Foo> foos = ...;            // an immutable list of mutable Foos.
+immutable List<immutable Foo> foos = ...;  // an immutable list of immutable Foos.
+// and so on...
+```
+
+尽管这也能正常工作，而且看起来很显而易见，但人类就是很难将事情做对！
+
+对于高级用户，我们也有一个方法来写参数化许可的泛型类型。这绝对需要对高度泛型代码内部的深入把握，否则会被系统 90% 的用户所忽略：
+
+```csharp
+delegate void PermFunc<T, U, V, permission P>(P T, P U, P V);
+
+// Used elsewhere; expands to `void(immutable Foo, immutable Bar, immutable Baz)`:
+PermFunc<Foo, Bar, Baz, immutable> func = ...;
+```
+
+我还得说明，为了方便起见，你可以将一个类型标记为 immutable，以指示所有这个类型的实例都是不可变的。这确实是最流行的特性之一。在系统开发结束时，我估计系统中大概所有类型中的 1/4 - 1/3 是被标记为不可变的。
+
+```csharp
+immutable class Foo {...}
+immutable struct Bar {...}
+```
+
+有一个有趣的扭转。正如我们将看到的，readonly 习惯性被称为 readable（可读），而完全是另一个东西。但在我们离开 Midori 后并努力尝试将这些概念纳入 C# 时，我们决定尝试并统一它们。这就是我在这里介绍的。唯一的障碍是，readonly 被给予了一个稍微不同的含义。作用在字段上时，readonly 现在的含义是“值不能被改变”；当值是指针时，readonly 现在并不会影响引用的对象图。而在这个新的模型中，它会。考虑到我们预计引入一个可选的标志：----strict-mutability，这是可以接受的，只需用 readonly mutable，有点绕，就能回到了旧的行为上。这对我来说不是什么血色交易 —— 特别由于 C# 中开发人员以为 readonly 是深度的（现在它会是了）是很常见的一个 bug，很明显在脑袋中跟 const 混淆了。
+
+#### 所有权
+
+第二个关键的概念是*所有权*。
 
