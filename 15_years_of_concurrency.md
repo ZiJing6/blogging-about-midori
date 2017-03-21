@@ -318,3 +318,38 @@ immutable struct Bar {...}
 
 第二个关键的概念是*所有权*。
 
+一个引用能给它一个所有权声明，就像能给一个许可一样：
+* isolated：目标对象（图）形成一个状态（state）的无别名（unaliased）可达的闭包。
+
+例如：
+
+```csharp
+isolated List<int> builder = new List<int>();
+```
+
+不像许可，许可指出对一个引用执行什么操作是合法的，所有权声明告诉我们关于给出的对象图的重要的别名使用属性。一个隔离的图只有单单一个“指入引用”，指向对象图中的根对象，而没有“指出引用”（除了不可变对象引用之外，那是被允许的。=）。
+
+这幅图可能能帮你理解这个概念：  
+![isolated visual](http://joeduffyblog.com/assets/img/2016-11-30-15-years-of-concurrency.isolated-bubble.jpg)
+
+针对一个隔离的对象，我们可以原位（in-place）更改它：
+
+```csharp
+for (int i = 0; i < 42; i++) {
+    builder.Add(i);
+}
+```
+
+且/或摧毁原先的引用并将所有权转让给一个新的引用：
+
+```csharp
+isolated List<int> builder2 = consume(builder);
+```
+
+在这里编译器会将 builder 标记为未初始化的，尽管如果它存储在堆中有可能存在多个别名会指向它，因此这样的分析永远都做不到刀枪不入。在这种情况下，原先的引用会被置为 null，以免有安全陷阱。（这是为了更自然地集成到现有的 C# 的类型系统中作出的许多妥协中的一个例子。）
+
+将隔离拆除也是可能的，就是拿回一个原先的 List&lt;int>：
+
+```csharp
+List<int> built = consume(builder);
+```
