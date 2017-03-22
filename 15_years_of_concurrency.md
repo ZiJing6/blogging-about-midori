@@ -6,11 +6,11 @@
 
 ## 背景
 
-在 21 世纪的大多数时间里，我的工作都是找出如何将并发交到开发者手中，这工作从微软 [CLR 团队](https://en.wikipedia.org/wiki/Common_Language_Runtime)的一个相关的适逢其会的工作开始。
+在 21 世纪的大多数时间里，我的工作都是找出如何将并发交到开发者手中，这工作从微软 [CLR 团队](https://en.wikipedia.org/wiki/Common_Language_Runtime)的一个相对小众的工作开始。
 
-### 适逢其会的开始
+### 小众的开始
 
-回到那个时候，这很大程度是需要构建一个经典线程、锁和同步原语的更好版本，并尽可能尝试将它们凝聚成最佳实践。例如，我们给 .NET 1.1 带来了一个线程池，并利用这个经验改善 Windows 内核、调度器以及它自己线程池的可伸缩性。我们有这个疯狂的 128 个处理器的 [NUMA（非均匀内存访问/非统一内存访问架构）](https://en.wikipedia.org/wiki/Non-uniform_memory_access) 机器，让我们忙于各种深奥的性能挑战。我们开发了[如何将并发弄妥当](http://joeduffyblog.com/2006/10/26/concurrency-and-the-impact-on-reusable-libraries/)的规则 —— 锁级别等等 —— 并进行了[静态分析](https://www.microsoft.com/en-us/research/wp-content/uploads/2008/08/tr-2008-108.pdf)实验。我甚至还写了关于它的[一本书](https://www.amazon.com/Concurrent-Programming-Windows-Joe-Duffy/dp/032143482X)。
+回到那个时候，这很大程度是需要构建一个经典线程、锁和同步原语的更好的版本，并尽可能尝试将它们凝聚成最佳实践。例如，我们给 .NET 1.1 带来了一个线程池，并利用这个经验改善 Windows 内核、调度器以及它自己线程池的可伸缩性。我们有这个疯狂的 128 个处理器的 [NUMA（非均匀内存访问/非统一内存访问架构）](https://en.wikipedia.org/wiki/Non-uniform_memory_access) 机器，让我们忙于各种深奥的性能挑战。我们开发了[如何将并发弄妥当](http://joeduffyblog.com/2006/10/26/concurrency-and-the-impact-on-reusable-libraries/)的规则 —— 锁级别等等 —— 并进行了[静态分析](https://www.microsoft.com/en-us/research/wp-content/uploads/2008/08/tr-2008-108.pdf)实验。我甚至还写了关于它的[一本书](https://www.amazon.com/Concurrent-Programming-Windows-Joe-Duffy/dp/032143482X)。
 
 为什么并发是第一位的？
 
@@ -368,6 +368,14 @@ immutable List<int> frozen = consume(builder);
 immutable List<int> frozen = new List<int>(new[] { 0, ..., 9 });
 ```
 
-在某种意义上，我们已经将我们的隔离泡（见上文）整个都变成绿色了。  
+在某种意义上，我们已经将我们的隔离泡（见上文）整个都变成绿色的了。  
 ![全绿隔离图](http://joeduffyblog.com/assets/img/2016-11-30-15-years-of-concurrency.immutable-bubble.jpg)
+
+在幕后，对类型系统的增强是 isolated 和所有权分析。我们很快会见到实践中的更多的这种形式，不过首先有一个简单的印象：这个 List&lt;int> 构造函数的所有输入都是 isolated —— 指的是在这个例子中用 new[] 构造出来的数组 —— 因此得出的 List&lt;int> 也是如此。
+
+事实上，任一个只使用 isolated 和/或 immutable 输入并被推断为 readonly 类型的表达式可被隐式升级到 immutable 的；又，一个相似的表达式，推断为 mutable 类型的，可被升级为 isolated。这意味着使用原有的表达式创建新的 isolated 和 immutable 是很直接的。
+
+这里的**安全**也依赖于环境权限（ambient authority）和泄露构造（leaky construction）的消除。
+
+#### 无环境权限
 
