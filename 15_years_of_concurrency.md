@@ -330,7 +330,7 @@ isolated List<int> builder = new List<int>();
 不像许可，许可指出对一个引用执行什么操作是合法的，所有权声明告诉我们关于给出的对象图的重要的别名使用属性。一个隔离的图只有单单一个“指入引用”，指向对象图中的根对象，而没有“指出引用”（除了不可变对象引用之外，那是被允许的。=）。
 
 这幅图可能能帮你理解这个概念：  
-![isolated visual](http://joeduffyblog.com/assets/img/2016-11-30-15-years-of-concurrency.isolated-bubble.jpg)
+![隔离图](http://joeduffyblog.com/assets/img/2016-11-30-15-years-of-concurrency.isolated-bubble.jpg)
 
 针对一个隔离的对象，我们可以原位（in-place）更改它：
 
@@ -353,3 +353,21 @@ isolated List<int> builder2 = consume(builder);
 ```csharp
 List<int> built = consume(builder);
 ```
+
+这就实现了一种对安全并发有用的线性形式 —— 对象可以安全地切换，包括buffer 的交换堆这样的特例在内 —— 也支持像 builder 这样的模式，为强不变性奠定了基础。
+
+要想知道为什么这跟不变性扯上关系，要注意到我们之前正好跳过了一个不可变的对象是怎样创建的。为了安全起见，类型系统需要证明不存在当时指向那个对象的其他的可变引用，而且之后也永远不会存在。谢天谢地，那就正是 isolated 能为我们做的！
+
+```csharp
+immutable List<int> frozen = consume(builder);
+```
+
+或者更简洁点，你倾向于这样做：
+
+```csharp
+immutable List<int> frozen = new List<int>(new[] { 0, ..., 9 });
+```
+
+在某种意义上，我们已经将我们的隔离泡（见上文）整个都变成绿色了。  
+![全绿隔离图](http://joeduffyblog.com/assets/img/2016-11-30-15-years-of-concurrency.immutable-bubble.jpg)
+
