@@ -379,3 +379,39 @@ immutable List<int> frozen = new List<int>(new[] { 0, ..., 9 });
 
 #### 无环境权限
 
+Midori 的一个原则是消除[环境权限](https://en.wikipedia.org/wiki/Ambient_authority)，这允许[基于能力的安全](https://github.com/ZiJing6/blogging-about-midori/blob/master/objects_as_secure_capabilities.md)，然而以一种微妙的方式也对不变性和下面要提到的安全并发抽象是很必要的。
+
+要知道为什么，让我们看看之前提到的 PureFunc 例子。这给了我们一种局部推断 lambda 表达式捕获的状态的方法。一种我们渴望的特性是函数只接受 immutable 的输入并形成[引用透明（Referential transparency）](https://en.wikipedia.org/wiki/Referential_transparency)的结果，这解锁了许多[创新的编译器优化](https://github.com/ZiJing6/blogging-about-midori/blob/master/safe_native_code.md)并更容易推断代码。
+
+然而，如果可变的静态东西还存在，就会存在 PureFunc 实际上不 pure 的诅咒！
+
+例如：
+
+```csharp
+static int x = 42;
+
+PureFunc<int> func = () => x++;
+```
+
+从类型系统的观点来看，这个 PureFunc 函数没捕获到状态，因此它遵循不可变捕获需求。（说：我们能“看到” x++，所以拒用这个 lambda，这个说法很有诱惑力，但这个 x++ 可能深藏在一系列虚调用中发生，那对我们是不可见的。）
+
+所有的副作用需要暴露给类型系统。过去的几年里，我们探索额外的声明来表示“这个方法会可变地访问静态变量”；然而，mutable 许可已经是我们处理这种情况的方法了，而且感觉上跟 Midori 采用的对于环境权限整体的立场是一致的。
+
+因此，我们排除了所有的环境副作用操作，替代为利用能力对象。这明显覆盖了I/O操作 —— 所有I/O在我们的系统中都是异步的RPC —— 同时甚至 —— 某种程度是从根本上 —— 意味着即使只是获取当前时间，或者生成一个随机数，都需要一个能力对象。这让我们以类型系统能看到的方式来对副作用进行建模，并同时收获能力对象带来的其他好处。
+
+这意味着所有的静态变量必须是不可变的。 这本质上将 C# 的 const 关键字带给了所有的静态变量：
+
+```csharp
+const Map<string, int> lookupTable = new Map<string, int>(...);
+```
+
+在 C# 中，const 只限制于基元数据常量，像 int、bool 和 string。我们的系统扩展了相同的能力到任意类型，像 list、map、……、真正所有的类型。
+
+这正是变得有趣的地方。正如 C# 现在 const 的概念一样，我们的编译器在编译时推断所有的这些对象，并将它们冻结到生成的二进制镜像的只读段中。感谢类型系统的保证，保证了不可变真的是不可变，这样干就不存在运行时出问题的风险了。
+
+冻结有两个吸引人的性能影响。首先，我们可以跨多个进程共享页面（page），减少了总体内存使用量和 TLB 压力。（例如，作为 map 的 lookup table 被自动共享给跨所有使用这个库的程序。）第二，我们能够消除所有类的构造方法的访问，用常量偏移来代替它，这使整个操作系统的代码大小减少了超过了 10%，以及相关的速度改进，特别是启动时间。
+
+可变的静态变量毫无疑问是昂贵的！
+
+#### 无泄漏构造
+
