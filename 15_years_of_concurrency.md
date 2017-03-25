@@ -449,3 +449,25 @@ const Map<string, int> lookupTable = new Map<string, int>(...);
 
 我们必须建立的核心特性是，当一个 activity（活动） 对一个给定的对象有 mutable 权，这个对象必须不能同时被任何其他的 activity 访问。请注意我正谨慎地在用“activity”这个术语。现在，可以想象它等同于“task（任务）”，尽管我们随时会回头看这个细微的地方。也请注意我说了“对象”；那也是一种粗暴的简化，因为对于某些像数组这样的数据结构，简单地保证 activity 对重叠的区域没有 mutable 权就足够了。
 
+超越这些不允许的东西，它事实上允许一些有趣的模式。举例说，任意数目的并发活动可以共享对同一个对象的 readonly 的访问。（这有点像读写锁，只是没有任何的锁，也没有运行时开销。）记住我们可以将 mutable 转换为 readonly，这意味着，对于给定的有 mutable 访问的的活动，我们可以捕获了一个有 readonly 许可的对象来做 fork/join 并行，只要在这个 fork/join 操作过程中，变化被临时暂停了。
+
+或者，看代码：
+
+```csharp
+int[] arr = ...;
+int[] results = await Parallel.Fork(
+    () => await arr.Reduce((x, y) => x+y),
+    () => await arr.Reduce((x, y) => x*y)
+);
+```
+
+仅仅读一下这段代码，我们就能知道它并行计算一个数组的求和以及乘积。这段代码是没有数据竞争的。
+
+怎也做到的呢？这个例子中的 Fork API 使用了许可来强制了所需要的安全性：
+
+```csharp
+public static async T[] Fork<T>(params ForkFunc<T>[] funcs);
+
+public async delegate T ForkFunc<T>() readonly;
+```
+
