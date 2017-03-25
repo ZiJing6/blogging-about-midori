@@ -445,3 +445,5 @@ const Map<string, int> lookupTable = new Map<string, int>(...);
 
 #### 这如何带来安全并发呢？
 
+掌握了新的类型系统，我们现在可以回头重新探访 PFX 抽象，并把它们都弄成安全的。
+
