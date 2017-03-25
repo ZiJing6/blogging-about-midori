@@ -417,3 +417,31 @@ const Map<string, int> lookupTable = new Map<string, int>(...);
 
 这带来了我们要修补的第二个“洞”：泄露的构造。
 
+泄露构造指的是任一个构造函数在构造完成之前就将 this 共享了出来。即使它是自己构造函数里“非常后面”的地方共享也是如此，因为继承和构造链，这样不能保证是安全的。
+
+那么，为什么构造泄露很危险？主要因为它们给其他相关方暴露了[部分构造的对象](http://joeduffyblog.com/2010/06/27/on-partiallyconstructed-objects/)，不仅那些对象的不变性值得怀疑，特别是构造可能会失败，而且它们还造成了不变性的风险。
+
+在我们这个特定的情况下，我们如何能知道在创建一个新的可能是不可变的对象之后，没有别的人隐秘地拥有一个可变的引用呢？在这种情况下，将这个对象打上 immutable 的标签是一个类型漏洞。
+
+我们完全禁止了所有的泄露构造。秘密是什么呢？一种特别的许可，init，这意味着目标对象正在进行初始化，从而不服从常规的规则。例如，它意味着字段还不能保证已经被赋值，非空性还未确保，并且对该对象的引用也不能转换为所谓的“顶级”权限， readonly 。任何构造函数默认都有这个权限，并且你不能覆盖它。我们还自动在特定区域使用 init 机制，以保证语言能够更加无缝地工作，就像在对象初始化器中一样。
+
+这会导致一个不好的后果：默认情况下，你不能从构造函数中调用其他实例方法。（说实话，这在我看来是件好事，因为这意味着你不用顾虑还未完全构造的对象，不会意外地[从构造函数中调用其他虚函数](https://www.securecoding.cert.org/confluence/display/cplusplus/OOP50-CPP.+Do+not+invoke+virtual+functions+from+constructors+or+destructors)，等等）。在大多数情况下，这个问题都能变通解决。但是，对于那些真正需要在构造函数中调用实例方法的情形，我们允许将方法标记为 init 来让它们则拥有该许可。
+
+#### 形式化及许可
+
+尽管上面这些直觉上是合理的，但在这些场景背后有一个形式化的类型系统。
+
+在即将将它作为系统核心时，我们跟 MSR 合作来证明这种方式的完整性，特别是 isolated，并在 [OOPSLA' 12](http://dl.acm.org/citation.cfm?id=2384619) 中发表了这篇论文（也在 [MSR 技术报告](http://research-srv.microsoft.com/pubs/170528/msr-tr-2012-79.pdf)中免费提供）。虽然论文是在最终模型固化下来的前些年发表的，但那时大多数关键的设想已经成型并且进行得很顺利。
+
+然而，作为一个简单的思维模型，我总是从子类型和替代的角度思考问题。
+
+事实上，一旦通过这种方式建模，对于类型系统的大多数启示就很自然地“瓜熟蒂落”。readonly 是 “最高权限”， mutable 和 immutable 都可以隐式地转换过去。转换到 immutable 是一个微妙的过程，需要 isolated 状态来保证遵守不变性需求。从那里起，所有的常见的启示开始出现，包括[替代（substitution）](https://en.wikipedia.org/wiki/Liskov_substitution_principle)，[协变（variance）](https://en.wikipedia.org/wiki/Covariance_and_contravariance_(computer_science))，以及它们对于转换、覆盖和子类型的各种影响。
+
+这形成了一个二维方阵，一个维度是经典观念中的“类型”，另一个是“许可”，这样所有的类型能够转换为 readonly 对象。如下图所示：
+
+![许可方阵](http://joeduffyblog.com/assets/img/2016-11-30-15-years-of-concurrency.lattice.jpg)
+
+没有这些形式化知识的帮助，系统显然也能跑。然而，我已经受够了[这些年来因为类型系统陷阱带来的让人提心吊胆又诡异的安全问题](https://www.microsoft.com/en-us/research/wp-content/uploads/2007/01/appsem-tcs.pdf)，所以走得更远点并做形式化不仅能帮助我们更好地理解我们的系统，还能让我们夜里能睡个好觉。
+
+#### 这如何带来安全并发呢？
+
