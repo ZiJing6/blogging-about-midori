@@ -435,7 +435,7 @@ const Map<string, int> lookupTable = new Map<string, int>(...);
 
 然而，作为一个简单的思维模型，我总是从子类型和替代的角度思考问题。
 
-事实上，一旦通过这种方式建模，对于类型系统的大多数启示就很自然地“瓜熟蒂落”。readonly 是 “最高权限”， mutable 和 immutable 都可以隐式地转换过去。转换到 immutable 是一个微妙的过程，需要 isolated 状态来保证遵守不变性需求。从那里起，所有的常见的启示开始出现，包括[替代（substitution）](https://en.wikipedia.org/wiki/Liskov_substitution_principle)，[协变（variance）](https://en.wikipedia.org/wiki/Covariance_and_contravariance_(computer_science))，以及它们对于转换、覆盖和子类型的各种影响。
+事实上，一旦通过这种方式建模，对于类型系统的大多数启示就很自然地“瓜熟蒂落”。readonly 是 “头等许可”， mutable 和 immutable 都可以隐式地转换过去。转换到 immutable 是一个微妙的过程，需要 isolated 状态来保证遵守不变性需求。从那里起，所有的常见的启示开始出现，包括[替代（substitution）](https://en.wikipedia.org/wiki/Liskov_substitution_principle)，[协变（variance）](https://en.wikipedia.org/wiki/Covariance_and_contravariance_(computer_science))，以及它们对于转换、覆盖和子类型的各种影响。
 
 这形成了一个二维方阵，一个维度是经典观念中的“类型”，另一个是“许可”，这样所有的类型能够转换为 readonly 对象。如下图所示：
 
@@ -446,4 +446,6 @@ const Map<string, int> lookupTable = new Map<string, int>(...);
 #### 这如何带来安全并发呢？
 
 掌握了新的类型系统，我们现在可以回头重新探访 PFX 抽象，并把它们都弄成安全的。
+
+我们必须建立的核心特性是，当一个 activity（活动） 对一个给定的对象有 mutable 权，这个对象必须不能同时被任何其他的 activity 访问。请注意我正谨慎地在用“activity”这个术语。现在，可以想象它等同于“task（任务）”，尽管我们随时会回头看这个细微的地方。也请注意我说了“对象”；那也是一种粗暴的简化，因为对于某些像数组这样的数据结构，简单地保证 activity 对重叠的区域没有 mutable 权就足够了。
 
