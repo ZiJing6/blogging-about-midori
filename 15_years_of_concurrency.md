@@ -463,7 +463,7 @@ int[] results = await Parallel.Fork(
 
 仅仅读一下这段代码，我们就能知道它并行计算一个数组的求和以及乘积。这段代码是没有数据竞争的。
 
-怎也做到的呢？这个例子中的 Fork API 使用了许可来强制了所需要的安全性：
+怎么做到的呢？这个例子中的 Fork API 使用了许可来强制了所需要的安全性：
 
 ```csharp
 public static async T[] Fork<T>(params ForkFunc<T>[] funcs);
