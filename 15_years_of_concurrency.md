@@ -471,5 +471,5 @@ public static async T[] Fork<T>(params ForkFunc<T>[] funcs);
 public async delegate T ForkFunc<T>() readonly;
 ```
 
-让我们一块块分开看这段代码。Fork 简单地使用一个 ForkFunc 数组。因为 Fork 是静态的，我们无需担心它会危险地捕获状态。但 ForkFunc 是个委托，可以通过实例方法和 lambda 表达式满足，这两者都可以闭合（close over）状态。通过将 this 位置标记为 readonly，我们将捕获限制为 readonly；因此，虽然在上面的例子中 lambda 表达式能捕获 arr，但它们不能改变它。就是这样。
+让我们一块块分开看这段代码。Fork 简单地使用一个 ForkFunc 数组。因为 Fork 是静态的，我们无需担心它会危险地捕获状态。但 ForkFunc 是个委托，可以通过实例方法和 lambda 表达式满足，这两者都可以闭合（close over）状态。通过将 this 位置标记为 readonly，我们将捕获限制为 readonly；因此，虽然在上面的例子中 lambda 表达式能捕获 arr，但它们不能改变它。就是如此。
 
