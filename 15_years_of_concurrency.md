@@ -449,7 +449,7 @@ const Map<string, int> lookupTable = new Map<string, int>(...);
 
 我们必须建立的核心特性是，当一个 activity（活动） 对一个给定的对象有 mutable 权，这个对象必须不能同时被任何其他的 activity 访问。请注意我正谨慎地在用“activity”这个术语。现在，可以想象它等同于“task（任务）”，尽管我们随时会回头看这个细微的地方。也请注意我说了“对象”；那也是一种粗暴的简化，因为对于某些像数组这样的数据结构，简单地保证 activity 对重叠的区域没有 mutable 权就足够了。
 
-超越这些不允许的东西，它事实上允许一些有趣的模式。举例说，任意数目的并发活动可以共享对同一个对象的 readonly 的访问。（这有点像读写锁，只是没有任何的锁，也没有运行时开销。）记住我们可以将 mutable 转换为 readonly，这意味着，对于给定的有 mutable 访问的的活动，我们可以捕获了一个有 readonly 许可的对象来做 fork/join 并行，只要在这个 fork/join 操作过程中，对状态的变更被临时暂停了。
+超越这些不允许的东西，它事实上允许一些有趣的模式。举例说，任意数目的并发活动可以共享对同一个对象的 readonly 的访问。（这有点像读写锁，只是没有任何的锁，也没有运行时开销。）记住我们可以将 mutable 转换为 readonly，这意味着，对于给定的有 mutable 访问的的活动，我们可以捕获了一个有 readonly 许可的对象来做 fork/join 并行，只要在这个 fork/join 操作过程中，修改器（mutator）被临时暂停了。
 
 或者，看代码：
 
@@ -473,11 +473,11 @@ public async delegate T ForkFunc<T>() readonly;
 
 让我们一块块分开看这段代码。Fork 简单地使用一个 ForkFunc 数组。因为 Fork 是静态的，我们无需担心它会危险地捕获状态。但 ForkFunc 是个委托，可以通过实例方法和 lambda 表达式满足，这两者都可以闭合（close over）状态。通过将 this 位置标记为 readonly，我们将捕获限制为 readonly；因此，虽然在上面的例子中 lambda 表达式能捕获 arr，但它们不能改变它。就是如此。
 
-也请注意内部的 Reduce 方法也能并行地运行，感谢 ForkFunc！显然，所有熟悉的 Parallel.For，Parallel.ForEach 以及它们伙伴们，能享受类似的待遇，类似的安全。
+也要注意内部的 Reduce 方法也能并行地运行，感谢 ForkFunc！显然，所有熟悉的 Parallel.For，Parallel.ForEach 以及它们伙伴们，能享受类似的待遇，类似的安全。
 
 结果是大多数 fork/join 模式，我们可以保证改变状态的方法被暂停的，也这样工作。例如，所有的 PLINQ 可以这样表现，具有完全的无数据竞争。这是我一直以来的用例。
 
-实际上，我们现在能引入了[自动并行](https://en.wikipedia.org/wiki/Automatic_parallelization)！有几种方法可以这样做。一种是永不提供不用 readonly 声明提供保护的 LINQ 操作，查询操作会带来改动是荒谬的。不过另外的方法也是可能的。一种是提供重载 —— 一组供给 mutable 操作，另一组供给 readonly 操作 —— 然后编译器的重载裁定会根据类型检查选择最小许可的那个。
+实际上，我们现在能引入了[自动并行](https://en.wikipedia.org/wiki/Automatic_parallelization)！有几种方法可以这样做。一种是永不提供不用 readonly 声明提供保护的 LINQ 操作，这是我倾向的办法，查询操作会带来改动是荒谬的。不过另外的方法也是可能的。一种是提供重载 —— 一组供给 mutable 操作，另一组供给 readonly 操作 —— 然后编译器的重载裁定会根据类型检查选择最小许可的那个。
 
 如先前所述，任务甚至比这样还简单：
 
@@ -485,5 +485,7 @@ public async delegate T ForkFunc<T>() readonly;
 public static Task<T> Run<T>(PureFunc<T> func);
 ```
 
-这接受了我们前面的老朋友，被保证引用透明的 PureFunc。因为任务没有类似 fork/join 和数据并行伙伴那样的结构化的生命周期，我们不能允许捕获甚至 readonly 的状态。记住，上述例子能工作的一个技巧是对状态的变更被临时暂停，而这在非结构化的任务并行中是不能保证的。
+这接受了我们前面的老朋友，被保证引用透明的 PureFunc。因为任务没有类似 fork/join 和数据并行伙伴那样的结构化的生命周期，我们甚至不能捕获 readonly 的状态。记住，上述例子能工作的一个技巧是修改器（mutator）被临时暂停了，而这在非结构化的任务并行中是不能保证的。
+
+那么，如果一个任务要处理可变的状态改怎么办呢？
 
