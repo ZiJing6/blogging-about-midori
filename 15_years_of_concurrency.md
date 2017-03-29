@@ -478,3 +478,5 @@ public async delegate T ForkFunc<T>() readonly;
 结果是大多数 fork/join 模式，我们可以保证改变状态的方法被暂停的，也这样工作。例如，所有的 PLINQ 可以这样表现，具有完全的无数据竞争。这是我一直以来的用例。
 
 实际上，我们现在能引入了[自动并行](https://en.wikipedia.org/wiki/Automatic_parallelization)！有几种方法可以这样做。一种是永不提供不用 readonly 声明提供保护的 LINQ 操作，查询操作会带来改动是荒谬的。不过另外的方法也是可能的。一种是提供重载 —— 一组供给 mutable 操作，另一组供给 readonly 操作 —— 然后编译器的重载裁定会根据类型检查选择最小许可的那个。
+
+如先前所述，任务甚至比这样还简单：
