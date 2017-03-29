@@ -476,3 +476,5 @@ public async delegate T ForkFunc<T>() readonly;
 也请注意内部的 Reduce 方法也能并行地运行，感谢 ForkFunc！显然，所有熟悉的 Parallel.For，Parallel.ForEach 以及它们伙伴们，能享受类似的待遇，类似的安全。
 
 结果是大多数 fork/join 模式，我们可以保证改变状态的方法被暂停的，也这样工作。例如，所有的 PLINQ 可以这样表现，具有完全的无数据竞争。这是我一直以来的用例。
+
+实际上，我们现在能引入了[自动并行](https://en.wikipedia.org/wiki/Automatic_parallelization)！
