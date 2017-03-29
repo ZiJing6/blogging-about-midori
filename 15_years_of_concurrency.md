@@ -484,3 +484,4 @@ public async delegate T ForkFunc<T>() readonly;
 ```csharp
 public static Task<T> Run<T>(PureFunc<T> func);
 ```
+
