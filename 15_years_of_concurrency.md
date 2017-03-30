@@ -489,3 +489,20 @@ public static Task<T> Run<T>(PureFunc<T> func);
 
 那么，如果一个任务要处理可变的状态该怎么办呢？
 
+对于这个，我们有 isolated！有几个方法可用来编码（encode）这个，不过我们也有一个办法来标记委托来指示它们可以捕获 isolated 的状态（有个副作用是将委托自身也变成了 isolated）：
+
+```csharp
+public static Task<T> Run<T>(TaskFunc<T> func);
+
+public async delegate T TaskFunc<T>() immutable isolated;
+```
+
+现在我们可以线性地将整个对象图交到任务上，永久地或临时地：
+
+```csharp
+isolated int[] data = ...;
+Task<int> t = Task.Run([consume data]() => {
+    // in here, we own `data`.
+});
+```
+
