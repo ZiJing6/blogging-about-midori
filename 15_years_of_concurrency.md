@@ -506,3 +506,9 @@ Task<int> t = Task.Run([consume data]() => {
 });
 ```
 
+请注意我们利用 lambda 捕获列表来直接对对象进行线性捕获。这有一个考虑给将来的 C# 添加类似特性的[积极的建议](https://github.com/dotnet/roslyn/issues/117)，然而脱离了 Midori 的许多特性，这个特性能否独立出来还需要继续观察。
+
+由于围绕 isolated 产生的规则，任务产生的 mutable 的对象可以变为 isolated 的，并且 readonly 的对象可以被冻结为 immutable。从组合的角度来看，这非常强大。
+
+最终，我们创建了更高层次的框架来帮助数据分隔，对类数组结构的非均匀数据并行访问等等。所有的这些都不会有数据竞争、死锁和相关的并发冒险。
+
