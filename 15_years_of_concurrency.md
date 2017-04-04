@@ -540,3 +540,7 @@ Task<int> t = Task.Run([consume data]() => {
 
 消息传递在构建正确、可靠的并发系统时有很大的帮助，但并不能包治百病。我之前提过不共享任何东西。然而这有一个肮脏的小秘密，即使你没有共享内存，但 agent 能够相互通信，你仍然在这些 agent 通信的消息中编码了共享的状态，并且由于这些消息的到达顺序不可预测，还是有竞争条件的机会。
 
+这是[可以理解](http://erlang.org/workshop/2004/cronqvist.pdf)的，虽然[可能不是非常广泛](https://www.it.uu.se/research/group/hipe/dialyzer/publications/races.pdf)。这些类型的竞争中最令人担心的后果是[检查时间到使用时间（time of check time of use (TOCTOU)）](https://en.wikipedia.org/wiki/Time_of_check_to_time_of_use),这是可能导致安全漏洞的竞争之一。（Midori 的类型和内存安全当然对避免这种特别的症状有帮助，但可靠性问题也是非常实在的。）
+
+虽然人们很讨厌我将这种情况与 COM 的 STA 进行比较，对于那些熟悉它们的人来说，一个对比是恰当的。如果你需要阻塞 COM STA 中的一个线程，你必须做决定：我是泵动消息循环呢（pump the message loop），还是不泵动消息循环？如果你选择泵动消息循环，你可能会遭受[重入](https://en.wikipedia.org/wiki/Reentrancy_(computing))，而重入可能会破坏不变性，而且可能在阻塞的调用之外修改了状态，当它被唤醒之后就很沮丧了。如果你选择不泵动消息循环，你就可能遭受死锁，调用累积了起来，而可能其中一个正是解除线程阻塞必需的。
+
