@@ -623,3 +623,5 @@ assert(await c.R > 0);
 
 ## 尾声和总结
 
+虽然我掩盖了很多细节，我希望你能享受这段旅程，基本的想法是清晰的。最重要的是，你能够从中学习到一些新的东西。如果你想了解什么东西的更多细节，请看看[我们的 OOPSLA 论文](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/msr-tr-2012-79.pdf)，或者直接问我们。
+
