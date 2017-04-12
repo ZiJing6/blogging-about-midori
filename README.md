@@ -14,7 +14,7 @@
     1. [三种安全](https://github.com/ZiJing6/blogging-about-midori/blob/master/a_tale_of_three_safeties.md) （翻译完成）   
     2. [作为安全能力的对象](https://github.com/ZiJing6/blogging-about-midori/blob/master/objects_as_secure_capabilities.md) （未翻译）  
     3. [异步一切](https://github.com/ZiJing6/blogging-about-midori/blob/master/asynchronous_everything.md) （翻译完成）  
-    4. [安全的本地代码](https://github.com/ZiJing6/blogging-about-midori/blob/master/safe_native_code.md) （未翻译）  
+    4. [安全的本机代码](https://github.com/ZiJing6/blogging-about-midori/blob/master/safe_native_code.md) （未翻译）  
     5. [错误模型](https://github.com/ZiJing6/blogging-about-midori/blob/master/the_error_model.md) （未翻译）  
     6. [性能文化](https://github.com/ZiJing6/blogging-about-midori/blob/master/performance_culture.md) （未翻译）  
     7. [并发 15 年](https://github.com/ZiJing6/blogging-about-midori/blob/master/15_years_of_concurrency.md) （翻译完成）  
