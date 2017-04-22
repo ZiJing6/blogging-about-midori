@@ -55,3 +55,24 @@
 
 #### 错误码
 
+错误码可以说是最简单的错误模型。想法是非常基本的，甚至不需要语言或运行时的支持。函数只是返回一个值，通常是一个整数，表示成功或者失败。
+
+```csharp
+int foo() {
+    // <try something here>
+    if (failed) {
+        return 1;
+    }
+    return 0;
+}
+```
+
+这就是典型的模式，返回一个 0 表示成功，非 0 表示失败。调用者必须检查它：
+
+```csharp
+int err = foo();
+if (err) {
+    // Error!  Deal with it.
+}
+```
+
