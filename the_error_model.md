@@ -258,3 +258,45 @@ if value, err := foo(); err != nil {
 
 找个现代的例子来说明的话，看看 [Scala 的 Option Type](http://danielwestheide.com/blog/2012/12/19/the-neophytes-guide-to-scala-part-5-the-option-type.html)。不幸的消息是一些语言，像那些在 ML 家族的，甚至 Scala （由于它的 JVM 血统），将这种优雅的模型和 unchecked exception 世界混合在一起。这污染了单独的数据类型方法的优雅。
 
+Haskell 做了一些更酷的事情，并且[给人一种异常处理的幻觉，但实际上还是使用错误码和本地控制流](https://wiki.haskell.org/Exception)：
+
+> 在 C++ 程序员中有个长久以来的争论，到底是异常还是错误返回码是正确的方式？ Niklas Wirth 认为异常是 goto 的化身，所以在他的语言中省略了它们。Haskell 通过一种老到的方式解决了这个问题：函数返回错误码，但错误码的处理不会让代码变得丑陋。
+
+这里的技巧是支持所有熟悉的 throw 和 catch 模式，但使用 monad 而不是控制流。
+
+虽然 [Rust 也使用错误码](https://doc.rust-lang.org/book/error-handling.html)，但它也是函数式的错误类型风格。例如，设想我们正在 Go 里写一个函数名叫 bar：我们会调用 foo，然后如果它失败了，就简单地传递错误给调用者：
+
+```go
+func bar() error {
+    if value, err := foo(); err != nil {
+        return err
+    } else {
+        // Use value ...
+    }
+}
+```
+
+在 Rust 中的写法不会更简洁。它可能会让 C 程序员陷入引入的繁琐的模式匹配语法中（一种真正的关注，而不是搞破坏）。然而，任一个熟悉函数式编程的程序会甚至眼皮都不会眨一下，而且这种方法当然会作为一个提醒，提醒你处理你的错误：
+
+```rust
+fn bar() -> Result<(), Error> {
+    match foo() {
+        Ok(value) => /* Use value ... */,
+        Err(err) => return Err(err)
+    }
+}
+```
+
+但它还能做得更好。Rust 有一个 [try! 宏](https://doc.rust-lang.org/std/macro.try!.html)，将上面那个例子缩减为一个表达式：
+
+```rust
+fn bar() -> Result<(), Error> {
+    let value = try!(foo);
+    // Use value ...
+}
+```
+
+这带给了我们美妙的甜点。它当然会有我之前提过的性能问题，但在所有其他的维度表现得非常好。单独地它是一个不完善的图画 —— 为此，我们需要覆盖 fail-fast（又称：放弃）—— 但就如我们将见到的一样，它远比现在任何其他广泛使用的的基于异常的模型要好。
+
+#### 异常
+
