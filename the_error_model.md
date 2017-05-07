@@ -300,3 +300,34 @@ fn bar() -> Result<(), Error> {
 
 #### 异常
 
+异常的历史引人入胜。在探索异常的旅程中，我花费了无数个小时追溯行业的步伐。包括阅读一些源头文章 —— 比如 Goodenough 在 1975 年的经典文章[《异常处理：问题和建议》](https://www.cs.virginia.edu/~weimer/2006-615/reading/goodenough-exceptions.pdf) —— 以及查找几种语言的方法：Ada、Eiffel、Modula-2 和 3、ML、以及，[最具启发性的 CLU](http://csg.csail.mit.edu/pubs/memos/Memo-155/Memo-155-3.pdf)。许多论文在总结这个漫长而艰辛的旅程方面做得比我要好，所以我在这里不会这么做。相反，我将重点放在对于搭建一个可靠的系统，那些方法有效，哪些不行。
+
+在我们开发错误模型时，可靠性是我们最重要的需求。如果你无法对故障进行适当的反应，你的系统从定义上不会非常可靠。操作系统通常来说需要可靠。可悲的是，最常见的模式 —— unchecked exception —— 是这个维度上你会做到最差的。
+
+由于这些原因，大部分可靠的系统采用的是返回码，而不是异常。这让本地决定如何最好地响应错误条件成为可能。我可能说得太快了，让我们深挖一下。
+
+#### Unchecked Exception（未检查异常）
+
+快速回顾一下。在未检查异常模型中，你 throw 和 catch 异常，而不将其作为类型系统或者函数签名的一部分。例如：
+
+```csharp
+// Foo throws an unhandled exception:
+void Foo() {
+    throw new Exception(...);
+}
+
+// Bar calls Foo, and handles that exception:
+void Bar() {
+    try {
+        Foo();
+    }
+    catch (Exception e) {
+        // Handle the error.
+    }
+}
+
+// Baz also calls Foo, but does not handle that exception:
+void Baz() {
+    Foo(); // Let the error escape to our callers.
+}
+```
