@@ -339,3 +339,6 @@ void Baz() {
 也许对脚本语言来说，统计正确性是不错的，但对操作系统的最底层，或任一个处理关键任务的应用，这不是一个合适的解决方案。我希望这个不会有什么争议。
 
 .NET 会导致更糟糕的的情况，由于它的_异步异常_。C++ 也有所谓的“异步异常”：那些由硬件错误触发的失败，像非法访问。然而，它在 .NET 中变得非常讨厌。任一个线程几乎可以在代码中的任一点注入失败。甚至在一个赋值的 RHS 和 LHS 之间！因此，源代码中看起来是原子性的操作，实际上并不是。我在[大概 10 年前写个一篇文章讨论这点](http://joeduffyblog.com/2005/03/18/atomicity-and-asynchronous-exception-failures/)，而挑战仍然还存在，尽管风险已经降低了，因为 .NET　大体认识到线程中止是有问题的。新的 CoreCLR 甚至缺少了 AppDomain，并且新的 ASP.NET Core 1.0 栈当然不像它过去那样用线程中止。但[那些 API 仍然存在](https://github.com/dotnet/coreclr/blob/99e7f7c741a847454ab0ace1febd911378dcb464/src/mscorlib/src/System/Threading/Thread.cs#L518)。
+
+有一个著名的对 C# 主设计师  Anders Hejlsberg 的采访，谓之 [checked exception 的麻烦](http://www.artima.com/intv/handcuffs.html)。从一个系统程序员的视角来看，其中的大部分都让你挠头。没有比这更说明 C# 的目标客户是快速程序开发者的语句了：
+
