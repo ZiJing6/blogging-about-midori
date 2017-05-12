@@ -348,3 +348,5 @@ void Baz() {
 
 这让我想起了 Visual Basic 中的 On Error Resume Next，以及 Windows Form 自动捕获并吞掉应用抛出的异常，然后试图继续。在这里，我不是在指责 Anders 的观点；呃，因为 C# 被广泛欢迎，我确信这是当时环境下正确的做法。但这显然不是写操作系统代码的正确方式。
 
+C++ 至少*试着*用它的[异常抛出规范](http://en.cppreference.com/w/cpp/language/except_spec)提供了一些比未检查异常更好的东西。不幸的是，这个特性依赖动态执行，这为它带来了死亡诅咒。
+
