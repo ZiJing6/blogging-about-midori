@@ -370,4 +370,41 @@ C++ 至少*试着*用它的[异常抛出规范](http://en.cppreference.com/w/cpp
 
 这种混乱是我们陷入了不利之境。特别是因为许多语言使用未经检查的异常。很明显，它们不适合用于编写底层的、可靠的系统代码。（我确信我这么坦白地说出这个会招来一些 C++ 敌人。）在 Midori 写了这几年代码之后，再用回使用未经检查异常的语言写代码让我飙泪，即使只是代码审查也是折磨。但是“谢天谢地”我们有从 Java 那里可以学习和借鉴的 checked exception ……对吧？
 
-#### Checked Exceptions（已经检查的异常）
+#### Checked Exceptions
+
+呃，checked exception。几乎所有 Java 程序员，以及所有近距离关注过 Java 的人都喜欢殴打的布偶。在我看来这很不公平，尤其是相对于未经检查的异常带来的麻烦来说。
+
+在 Java 中，你*大体上*可以知道一个方法会抛出什么，因为一个方法必须要这样声明：
+
+```java
+void foo() throws FooException, BarException {
+    ...
+}
+```
+
+现在调用方就知道了调用 foo 可能会导致抛出 FooException 或 BarException。在调用点，程序员必须做出决定：1）原样传播异常，2）捕获异常并处理它们，或者 3）用某种方式转换抛出异常的类型（可能甚至“忘记”所有的类型）。举个例子：
+
+```java
+// 1) Propagate exceptions as-is:
+void bar() throws FooException, BarException {
+    foo();
+}
+
+// 2) Catch and deal with them:
+void bar() {
+    try {
+        foo();
+    }
+    catch (FooException e) {
+        // Deal with the FooException error conditions.
+    }
+    catch (BarException e) {
+        // Deal with the BarException error conditions.
+    }
+}
+
+// 3) Transform the exception types being thrown:
+void bar() throws Exception {
+    foo();
+}
+```
