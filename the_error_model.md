@@ -605,3 +605,5 @@ void Foo() {
     Release.Assert(something); // Always-checked assert.
 }
 ```
+
+我们也实现了类似 C++ 中的 \_\_FILE__ 和  \_\_LINE__ 宏，再加上用于谓词表达式文本化的 \_\_EXPR__，以使由于断言失败而导致的丢弃携带更有用的信息。
