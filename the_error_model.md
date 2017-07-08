@@ -614,3 +614,11 @@ void Foo() {
 
 ### 契约（Contract）
 
+契约是在 Midori 里找到 bug 的主要机制。尽管我们是从 [Singularity](https://en.wikipedia.org/wiki/Singularity_(operating_system)) 开始的，它使用了 [Spec#](http://research.microsoft.com/en-us/projects/specsharp/) 的一个变体，但我们很快就转到了甜美的 C# 并不得不重新发明我们想要的东西。在跟这个模型处了几年之后，我们最终得到了很不同的东西。
+
+所有的契约和断言被证明是无副作用的，由于我们语言对不可变性和副作用的理解。这也许是语言创新的最大的一个领域，所以我肯定会很快写一篇关于这个的文章。
+
+与其他领域一样，我们受到了许多其他系统的启发和影响。Spec# 是显然的一个。[Eiffel 是非常有影响力的](https://files.ifi.uzh.ch/rerg/amadeus/teaching/courses/ase_fs10/Meyer1992.pdf)，特别是有许多发表的案例研究能供学习。研究努力，像基于 Ada 的 [SPARK](https://en.wikipedia.org/wiki/SPARK_(programming_language))，以及实时和嵌入式系统的建议。深入理论的虎穴，[Hoare 的公理语义](http://www.spatial.maine.edu/~worboys/processes/hoare%20axiomatic.pdf)等编程逻辑证明了这一切的基础。不过，对于我来说，最具哲学意义的灵感来自于 CLU 的，以及后来的来自 [Argus](https://pdos.csail.mit.edu/archive/6.824-2009/papers/argus88.pdf) 的，处理错误的整体方法。
+
+#### 前置条件和后置条件
+
