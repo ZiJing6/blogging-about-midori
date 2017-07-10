@@ -622,3 +622,43 @@ void Foo() {
 
 #### 前置条件和后置条件
 
+契约最基本的形式是方法的前置条件。这说明了当方法要分发时，必需要保持什么什么条件。这通常用于验证参数变量。有时候它用于验证目标对象的状态，虽然这通常不是太好的做法，因为形态对于程序员去依赖来说是件困难的事。前置条件实质上是调用者对被调用者的保证。
+
+在我们最终的模型中，前置条件是使用 requires 关键字声明的：
+
+```csharp
+void Register(string name)
+    requires !string.IsEmpty(name) {
+    // Proceed, knowing the string isn't empty.
+}
+```
+
+一种较不常见的契约形式是方法的后置条件。这说明了当方法被执行*之后*应该保持什么样的条件。这是被调用者对调用者的保证。
+
+在我们的最终模型中，后置条件使用 ensures 关键字来声明：
+
+```csharp
+void Clear()
+    ensures Count == 0 {
+    // Proceed; the caller can be guaranteed the Count is 0 when we return.
+}
+```
+
+在后置条件中提及返回值是可能的，通过特别的 return 名称。先前的值 —— 例如需要在后置条件中提及的输入值 —— 可以通过 old(..) 方法来捕获；例如：
+
+```csharp
+int AddOne(int value)
+    ensures return == old(value)+1 {
+    ...
+}
+```
+
+当然，前置和后置条件可以混合使用。例如，来自我们的 Midori 内核的环缓冲（ring buffer）：
+
+```csharp
+public bool PublishPosition()
+    requires RemainingSize == 0
+    ensures UnpublishedSize == 0 {
+    ...
+}
+```
