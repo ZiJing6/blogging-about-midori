@@ -662,3 +662,8 @@ public bool PublishPosition()
     ...
 }
 ```
+
+这个方法知道 RemainingSize 为 0，可以安全地执行它的方法体，调用者知道返回后 UnpublishedSize 也是 0，可以安全地执行返回后的代码。
+
+如果任一个契约在运行时被发现为 false，丢弃就发生了。
+
