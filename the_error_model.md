@@ -673,3 +673,29 @@ public bool PublishPosition()
 
 此外，方法声明的契约是它的签名的一部分。这意味着它们会自动地显示在文档中，在 IDE 的工具提示中，在其他地方。契约跟方法的返回类型和参数类型一样重要。契约实际上是类型系统的扩展，使用语言中任意的逻辑来控制交换类型的形状。因此，所有通常的子类型要求都适用于它们。而且，当然，这适用于模块化的本地分析，可以在几秒内使用标准优化编译器技巧来完成。
 
+在 .NET 和 Java 中有 90% 的典型的使用异常场景变成了使用前置条件。包括所有的 ArgumentNullException、ArgumentOutOfRangeException 以及相关的类型，以及更重要的是，手工的检查并抛出异常已经拜拜了。目前在 C# 中，方法经常跟这些检查搅和在一起；光在 .NET 的 CoreFX 仓库中就有数以千计的这些东西。例如，下面是 System.IO.TextReader 的 Read 方法：
+
+```csharp
+/// <summary>
+/// ...
+/// </summary>
+/// <exception cref="ArgumentNullException">Thrown if buffer is null.</exception>
+/// <exception cref="ArgumentOutOfRangeException">Thrown if index is less than zero.</exception>
+/// <exception cref="ArgumentOutOfRangeException">Thrown if count is less than zero.</exception>
+/// <exception cref="ArgumentException">Thrown if index and count are outside of buffer's bounds.</exception>
+public virtual int Read(char[] buffer, int index, int count) {
+    if (buffer == null) {
+        throw new ArgumentNullException("buffer");
+    }
+    if (index < 0) {
+        throw new ArgumentOutOfRangeException("index");
+    }
+    if (count < 0) {
+        throw new ArgumentOutOfRangeException("count");
+    }
+    if (buffer.Length - index < count) {
+        throw new ArgumentException();
+    }
+    ...
+}
+```
