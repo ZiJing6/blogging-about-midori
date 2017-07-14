@@ -699,3 +699,21 @@ public virtual int Read(char[] buffer, int index, int count) {
     ...
 }
 ```
+
+由于一些原因，这样做是很破碎的。当然，这很冗长繁琐，所有这些繁文缛节！但我们不得不用我们的方式来文档化这些异常，开发人员真的不应该 catch 它们。相反，他们应该在开发过程中找到这些 bug 并修复它。所有这些异常废话鼓励了非常差的行为。
+
+另一方面，如果我们使用 Midori 风格的契约，这就能缩减为：
+
+```csharp
+/// <summary>
+/// ...
+/// </summary>
+public virtual int Read(char[] buffer, int index, int count)
+    requires buffer != null
+    requires index >= 0
+    requires count >= 0
+    requires buffer.Length - index >= count {
+    ...
+}
+```
+
