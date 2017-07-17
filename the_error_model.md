@@ -717,3 +717,27 @@ public virtual int Read(char[] buffer, int index, int count)
 }
 ```
 
+这就有了一些有吸引力的东西。首先，它更简洁。而且更重要的是，它通过一种文档化自己并且很容易被调用者理解的方式自描述了 API 的契约。而不是要求程序员用英语来表达错误条件，实际的表达式可供调用者阅读，并且有工具来理解和使用。它使用丢弃来跟失败联系起来。
+
+我还应该提到我们有大量的契约帮助类来帮助开发人员编写通用的前置条件。上述的显式的范围检查非常凌乱，容易出错。相反，我们可以这样写：
+
+```csharp
+public virtual int Read(char[] buffer, int index, int count)
+    requires buffer != null
+    requires Range.IsValid(index, count, buffer.Length) {
+    ...
+}
+```
+
+并且，除了手头上的那些活，在加上两个高级的特性 —— 数组作为切片（slice）和非空类型 —— 我们可以将代码缩减到下面这样，并保持同样的保证：
+
+```csharp
+public virtual int Read(char[] buffer) {
+    ...
+}
+```
+
+不过我跳过头了……
+
+#### 简陋的起点
+
