@@ -741,3 +741,19 @@ public virtual int Read(char[] buffer) {
 
 #### 简陋的起点
 
+虽然我们已经达成了这种明显的很像 Eiffel 和 Spec# 的语法 —— 回到原点 —— 如前所述，我们实际上并不是一开始就想要改变语言的。实际上我们从采用简单的 API 方法开始的：
+
+```csharp
+public bool PublishPosition() {
+    Contract.Requires(RemainingSize == 0);
+    Contract.Ensures(UnpublishedSize == 0);
+    ...
+}
+```
+
+这种方法有一些问题，跟 [.NET 代码契约](http://research.microsoft.com/en-us/projects/contracts/)努力发现的困难的部分一样。
+
+首先，以这种方式编写的契约是 API *实现*的一部分，而我们希望它们成为*签名*的一部分。这似乎是一个理论上的关注点，但它远不止是理论上的。我们希望生成的程序包含内置的元数据，因此像 IDE 和调试器这样的工具可以在调用的时候显示契约。而且我们希望工具能够从契约中自动生成文档。而将它们埋藏在实现中是做不到这点的，除非你以某种方式反编译这个方法来将它们提取出来（这是一种 hack）。
+
+这也使得它很难跟后端的编译器集成，而我们发现对于好的性能来说，这很有必要。
+
