@@ -765,3 +765,7 @@ public bool PublishPosition() {
 * 通常的，通过 Contract.* 来声明，让什么时候检查它作为一个实现的决定。
 * 强，通过 Contract.Strong.* 来声明，意思是一直都需要检查。
 
+我得承认，一开始我觉得这是一个优雅的方案。不幸的是，随着时间的推移，我们发现，是否应该在 debug 和 release 版本中或者在上面全部版本中检查“通常的”契约造成了混乱，所以人们也对应地滥用了弱和强契约。不管怎么说，当我们开始集成这个方案到语言和后端编译器工具链中时，我们遇到了相当多的问题，不得不开始反思这一点。
+
+首先，如果你简单地将 Contract.Weak.Requires 翻译成 weak requires 和将 Contract.Strong.Requires 翻译到 strong requires，在我看来，你最终会得到一种相当笨拙和特例化的语法，有更多的策略，而不是让我感觉到更舒服。它立刻就会引出 weak/strong 策略的参数化和可替换性。
+
