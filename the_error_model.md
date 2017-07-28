@@ -803,3 +803,6 @@ public class List<T> {
 ...
 }
 ```
+
+请注意 invariant 是被标记为 private 的。一个不变量的访问修饰符控制了哪些成员必须保持不变性。举个例子，一个 public invariant 只是必须保持 public 函数的出口和出口的不变性；这就允许了 private 函数可以临时违反不变性的通用的模式，只要公共的入口能够保护它们。当然，跟上面例子一样，一个类也可以自由地声明一个 private invariant，来要求保持所有函数入口和出口的不变性。
+
