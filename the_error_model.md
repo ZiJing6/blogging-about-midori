@@ -861,4 +861,6 @@ public virtual int Read(char[] buffer) {
  4. T 可以隐式转换为 T?。某种意义上，T 是 T? 的一个子类型（虽然也不是全对）。
  5. 存在转换 T? 到 T 的操作符，通过运行时检查如果是 null 会触发丢弃（abandoned）。
 
+ 这里面大多数都可能是“显而易见的”，因为没有太多的选择。这种做法的意义是确保类型系统知道 null 的所有路径。特别是，没有 null 可以“偷偷地”变成 non-null 类型 T 的值；这意味着解决 0 初始化（zero-initialization）也许是这里面最难的问题。
+
  
