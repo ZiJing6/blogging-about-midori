@@ -911,3 +911,19 @@ notnull 操作符将任何的 T? 表达式转为 T 的表达式。
 
 ###### 泛型
 
+泛型很困难，因为有多个层次的可空性需要考虑。考虑一下：
+
+```csharp
+class C {
+    public T M<T>();
+    public T? N<T>();
+}
+
+var a = C.M<object>();
+var b = C.M<object?>();
+var c = C.N<object>();
+var d = C.N<object?>();
+```
+
+基本的问题是：a、b、c 和 d 的类型都是什么？
+
