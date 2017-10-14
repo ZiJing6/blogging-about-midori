@@ -863,4 +863,51 @@ public virtual int Read(char[] buffer) {
 
  这里面大多数都可能是“显而易见的”，因为没有太多的选择。这种做法的意义是确保类型系统知道 null 的所有路径。特别是，没有 null 可以“偷偷地”变成 non-null 类型 T 的值；这意味着解决 0 初始化（zero-initialization）也许是这里面最难的问题。
 
- 
+ ###### 语法
+
+ 从语法层面，我们提供了一些方法来达成 #5，将 T? 转换为 T。当然，我们并不鼓励这样做，而是宁愿你尽可能地待在“非空”的世界中。但有时候这是不可能的。多步骤的初始化经常发生 —— 特别是跟集合数据结构一起 —— 所以必须得到支持。
+
+ 设想有一刻我们有一个 map：
+
+ ```csharp
+ Map<int, Customer> customers = ...;
+ ```
+
+这告诉我们关于构造的三件事：
+
+1. Map 自身是非空的。
+2. 它里面作为 key 的 int 也不能是空。
+3. 它里面的 Customer 值也不能为空。
+
+现在假设所引起会返回 null 来表示缺少对应的 key：
+
+```csharp
+public TValue? this[TKey key] {
+    get { ... }
+}
+```
+
+现在，在调用方我们需要一些方法来检查查找是否成功。我们讨论了许多语法。
+
+我们最容易实现的是保护性检查：
+
+```csharp
+Customer? customer = customers[id];
+if (customer != null) {
+    // In here, `customer` is of non-null type `Customer`.
+}
+```
+
+我承认，我对这种“魔术般的”类型强制保持观望态度。当它失败了总是很难指出什么东西错了，总让我烦恼。例如，如果你将 c 跟持有 null 值的变量比较，它就不生效，必须是字面上的 null。不过这种语法很容易记住，通常也是正确的。
+
+这些检查会动态地分支到不同的逻辑块，如果值的确为 null 的话。通常你会想要简单地断言这个值是 non-null 的，否则就进行丢弃。有一个显式的类型断言操作符可以这样做：
+
+```csharp
+Customer? maybeCustomer = customers[id];
+Customer customer = notnull(maybeCustomer);
+```
+
+notnull 操作符将任何的 T? 表达式转为 T 的表达式。
+
+###### 泛型
+
