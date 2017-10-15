@@ -927,3 +927,22 @@ var d = C.N<object?>();
 
 基本的问题是：a、b、c 和 d 的类型都是什么？
 
+我觉得我们一开始将它搞得比我们需要的更难了，很大程度是因为 C# 现有的可空（nullable）是一个相当古怪的东西，我们试图分心去模拟它太多了。好消息是我们最终找到了我们自己的道路，但这也花了好一段时间。
+
+为了说清楚我的意思，让我们回到先前的这个例子。有两个阵营：
+
+* .NET 阵营：a 是 object；b、c 以及 d 都是 object?。
+* 函数式语言阵营：a 是 object；b 和 c 是 object?；d 是 object??。
+
+换句话说，.NET 阵营认为你应该将任意一个或多个 ? 串折叠到单一个 ?。函数式阵营 —— 能理解数学组合的优雅 —— 避免了魔法操作，而是让世界跟它本身一样。最终我们认识到 .NET 的路线非常复杂，并且需要运行时的支持。
+
+函数式语言的路线一开始会让你的脑袋有点大。例如，砍回先前的 map 例子：
+
+```csharp
+Map<int, Customer?> customers = ...;
+Customer?? customer = customers[id];
+if (customer != null) {
+    // Notice, `customer` is still `Customer?` in here, and could still be `null`!
+}
+```
+
