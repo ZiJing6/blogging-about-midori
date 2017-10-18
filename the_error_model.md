@@ -1042,7 +1042,7 @@ T Get(T[] array, number<0, array.Length> index) {
 
  ### 进入异常
 
- 我们对可以从中恢复的错误使用异常。不是那种 unchecked 的异常，也不是就 Java 的那种 checked的。
+ 我们对可以从中恢复的错误使用异常。不是那种 unchecked 的异常，也不是就 Java 的那种 checked 的。
 
  首先的首先：虽然 Midori 使用异常，但一个没有进行 throws 声明的方法永远都不会抛出一个异常，永远也不会。没有像 Java 中鬼鬼祟祟的 RuntimeException。我们无论如何也不需要它们，因为对于 Java 中使用运行时异常的情况，Midori 中会使用丢弃。
 
@@ -1054,4 +1054,3 @@ T Get(T[] array, number<0, array.Length> index) {
 
  #### 语言和类型系统
 
- 
