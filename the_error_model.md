@@ -1056,3 +1056,50 @@ T Get(T[] array, number<0, array.Length> index) {
 
 在某种程度上，我做了一个有争议的观察和决定。正如你不会在改动一个函数的返回值之后期待它没有带来兼容性影响一样，你也不应该在改变一个函数的异常类型时怀有这样的期望。_用另一句话说，异常，跟用错误代码一样，只是另一种形式的返回值！_
 
+这是针对已检查异常的重复论证之一。我的回答听起来很老套, 但很简单: 太糟糕了。你使用的是静态类型的编程语言, 而异常的动态特性正是它们糟糕的原因。我们试图解决正是这些问题, 所以我们接受它, 美化强大的输入, 并且从不回头。仅此一项就有助于弥合错误代码和异常之间的鸿沟。
+
+函数会抛出的异常成为其签名的一部分, 就像参数和返回值一样。请记住, 由于与丢弃相比，异常具有比较少出现的性质, 因此这并不像你想象的那么痛苦。许多直观的属性自然地从这个决定中流出。
+
+第一件事是 [Liskov 替代原则](https://en.wikipedia.org/wiki/Liskov_substitution_principle)。为了避免 C++ 中发现的混乱，所有的“检查”必须在编译时静态地进行。因此，所有的那些在 [WG21 论文](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2010/n3051.html)提到的性能问题对我们来说都不是问题。然而，这个类型系统必须是刀枪不入的，没有后门可以摧毁它。因为在我们优化的编译器中，我们需要依赖 throws 声明来解决那些性能挑战，类型安全紧紧地铰接在这个属性上。
+
+我们尝试了很多种不同的语法。在我们致力于改变语言之前，我们用 C# 的 attribute 和静态分析做了一切。用户体验不是非常好，而且很难那样达成一个真正的类型系统。此外，这也显得太费劲了。我们也实验了 Redhawk 项目的做法 —— 最终这项目变成了 .NET Native 和 CoreRT —— 然而，这种方法也没有利用语言，而是依赖静态分析，虽然它跟我们最终的解决方案共享了很多相似的原则。
+
+最终语法的基本要点是简单将一个方法标记为 throws：
+
+```csharp
+void Foo() throws {
+    ...
+}
+```
+
+（有许多年，我们实际上将 throws 放在方法的开头，但这样看起来不对劲。）
+
+这样，替代问题就很简单了。一个 throws 的函数不能取代一个非 throws 函数的位置（非法的强化）。一个非 throws 的函数，在另一方面，可以取代一个 throws 方法的位置（合法的弱化）。这显然影响了虚拟重写（virtual override）、接口实现以及 lambda。
+
+当然，我们做了同样预期的逆变替代。例如，如果 Foo 是 virtual 的，而你 override 了它但不会抛出异常，你就不需要声明 throws 协定。当然，任何通过虚拟调用这样方法的人不会用到这一点，但直接调用可以。
+
+例如，这是合法的：
+
+```csharp
+class Base {
+    public virtual void Foo() throws {...}
+}
+
+class Derived : Base {
+    // My particular implementation doesn't need to throw:
+    public override void Foo() {...}
+}
+```
+
+而像下面这样实现的话，Derived 的调用者会使用缺乏 throws 的方式；而这是完全非法的：
+
+```csharp
+class Base {
+    public virtual void Foo () {...}
+}
+
+class Derived : Base {
+    public override void Foo() throws {...}
+}
+```
+
