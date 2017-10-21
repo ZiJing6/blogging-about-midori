@@ -1130,3 +1130,28 @@ int Foo() throws FooException, BarException {
 
 #### 容易审计的调用点
 
+故事行进到这里，我们仍然还没有完成关于错误代码的完全显式语法。函数的声明表示了它们是否会失败（好），但那些函数的调用方仍然还承接这静默的控制流（坏）。
+
+这带来了关于我们异常模型我一直喜爱一些东西。一个调用点需要表达出 try：
+
+```csharp
+int value = try Foo();
+```
+
+这调用了 Foo 函数，如果有错误发生就传播它，否则就将返回值赋予 value。
+
+这有一个非常棒的性质：程序中所有的控制流都保持为显式的。你可以将 try 设想为一种有条件的 return（或者你愿意的话，有条件的 throw）。我_真他妈喜欢_它让审查代码的错误逻辑变得多么容易！举个例子，设想一个很长的有少数几个 try 在里面的函数；有显式的声明让失败的点，以及因此的控制流，跟 return 语句一样容易地辨认出来：
+
+```csharp
+void doSomething() throws {
+    blah();
+    var x = blah_blah(blah());
+    var y = try blah(); // <-- ah, hah! something that can fail!
+    blahdiblahdiblahdiblahdi();
+    blahblahblahblah(try blahblah()); // <-- another one!
+    and_so_on(...);
+}
+```
+
+若你在编辑器中有语法高亮，那些 try 是粗大的蓝色显示，那就更好了。
+
