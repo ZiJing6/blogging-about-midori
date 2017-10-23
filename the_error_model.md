@@ -1190,3 +1190,54 @@ try doSomething();
 
 #### 语法糖
 
+我们还提供了一些用于处理错误的语法糖。try/catch 范围构造有点冗长了，特别是在你正遵循我们尽可能在本地处理错误的最佳实践时。对某些人来说它也还仍然存在某些 goto 感觉，特别是你正在从返回代码的角度考虑时。最终给出了一个我们称为 Result&lt;T> 类型的方法，这类型要不是一个 T，要不是一个异常。
+
+这实际上从控制流的世界过渡到了数据流的世界，应对某些后者更加自然的情形。虽然大多数开发人员选择熟悉的控制流语法，但两者肯定都有自己的位置。
+
+为了说明常见的用法，假设你想记录所有发生的异常的日志，然后再传播异常。虽然这是一种常见的模式，使用 try/catch 块感觉有点过于控制流的沉重，就我的口味来说：
+
+```csharp
+int v;
+try {
+    v = try Foo();
+    // 也许更多的东西。。。
+}
+catch (Exception e) {
+    Log(e);
+    rethrow;
+}
+// Use the value `v`...
+```
+
+那“也许更多的东西”引诱你将超出你应该做的东西挤压到 try 块里。将这跟使用 Result&lt;T> 比较，有更多的“返回码感”并且更加方便进行本地处理：
+
+```csharp
+Result<int> value = try Foo() else catch;
+if (value.IsFailure) {
+    Log(value.Exception);
+    throw value.Exception;
+}
+// Use the value `value.Value`...
+```
+
+这里的 try...catch 构造也允许你使用自己的值来做替代，或者甚至触发丢弃来作为失败的相应：
+
+```csharp
+int value1 = try Foo() else 42;
+int value2 = try Foo() else Release.Fail();
+```
+
+通过将 T 成员的访问从 Result&lt;T> 提升出来，我们也支持数据流错误的 NaN 风格。例如，假设我们有两个 Result&lt;T>，想将他们加在一起。我可以这样做：
+
+```csharp
+Result<int> x = ...;
+Result<int> y = ...;
+Result<int> z = x + y;
+```
+
+请注意第三行，那里我们将两个 Result&lt;int> 加起来，生成一个 —— 是的 —— 第三个 Result&lt;T>。这就是 NaN 风格的数据流传播，跟 C# 中新的 ?. 特性类似。
+
+这种方法将异常、返回码、以及数据流传播优雅地混合了起来。
+
+### 实现
+
