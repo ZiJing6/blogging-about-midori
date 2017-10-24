@@ -1303,7 +1303,7 @@ const Exception retryLayout = new Exception();
 throw retryLayout;
 ```
 
-对于具有高 throw 和 catch 的系统 —— 像我们的分析器、FRP UI 框架、以及另外的一些领域 —— 高性能是至关紧要的。这里的示例说明了为什么我们不能简单地学舌说“异常是很慢地”。
+对于具有高 throw 和 catch 率的系统 —— 像我们的分析器、FRP UI 框架、以及另外的一些领域 —— 高性能是至关紧要的。这里的示例说明了为什么我们不能简单地学舌说“异常是很慢地”。
 
 ### 模式
 
