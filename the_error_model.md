@@ -1417,6 +1417,39 @@ async interface IFileSystemKeeper {
 
 最后，我需要指出的是，Windows 的结构化异常处理（SEH）系统支持“可继续”的异常，这种异常在概念上试图实现同样的事情。他们让一些代码决定如何重启断裂的计算。不幸的是，它们是使用调用栈上的环境处理器实现的，而不是语言中的头等对象，所以相对于守护者而言，远没有那么优雅，而且易于出错。
 
+#### 未来方向：影响类型化（Effect Typing）
 
+大多数人问我们，存在作为类型系统属性的 async 和 throws 是否分裂了类库的整个统一性。答案是“不，不见得。”但在高度多态的类库代码中的确是痛苦的。
 
+最不顺的例子是像 map、filter、sort 等等的组合。在这些情况下，你通常有任意的函数并希望那些函数的 async 和 throws 属性透明地“流过”。
+
+我们用于处理这个的设计是让你将影响参数化。作为例子，这里有一个统一的映射方法 Map，它传递函数参数中 async 或 throws 影响：
+
+```csharp
+U[] Map<T, U, effect E>(T[] ts, Func<T, U, E> func) E {
+    U[] us = new U[ts.Length];
+    for (int i = 0; i < ts.Length; i++) {
+        us[i] = effect(E) func(ts[i]);
+    }
+    return us;
+}
+```
+
+请注意我们有一个普通的通用类型 E，除了它是通过关键字 effect 前缀声明。然后我们使用 E 来象征性地代替 Map 签名地效果列表，除了调用 func 函数时在“传播位置”通过 effect(E) 来使用它。这是一个相当繁琐的替换练习，用 throws 代替 E 和用 try 代替 effect(E)，来了解逻辑转换。
+
+一个合法的调用像这样：
+
+```csharp
+int[] xs = ...;
+string[] ys = try Map<int, string, throws>(xs, x => ...);
+```
+
+请注意，throws 流过了，因此我们得以传递一个 throws 异常的回调。
+
+作为一个整体，我们讨论要将这个更进一步，并允许程序员声明任意的影响。我[以前就假设过这样的系统](http://joeduffyblog.com/2010/04/25/from-simple-annotations-for-analysis-to-effect-typing/)。然而我们担心的是，这种高阶编程可能需要不必要的聪明并且难以理解，不管多么强大。上面的简单模型可能是甜区，如果给我们更多几个月的话，我们可能已经将它完成了。
+
+## 回顾及总结
+
+  
+  
 > 原文：[The Error Model](http://joeduffyblog.com/2016/02/07/the-error-model/)
