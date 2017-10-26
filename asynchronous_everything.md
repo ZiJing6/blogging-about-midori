@@ -1,5 +1,8 @@
 # 异步一切
 
+> 原文：[Asynchronous Everything](http://joeduffyblog.com/2015/11/19/asynchronous-everything/)
+
+
 Midori 是由很多超轻量级、细粒度进程构成的，它们通过强类型的消息传递接口连接彼此。通常见到的经典程序是那种单个的、庞大的进程 —— 也许内部还有多个线程。但我们取替之以一大堆的小进程，形成了自然的、安全的和大量的自动并行。同步阻塞直接就是不允许的，这意味着，不夸张地说所有的东西都是异步的：所有的文件和网络 IO，所有的消息传递，和所有的像跟其他异步工作项会合的“同步”活动项。因此造就系统超高并发，用户输入响应良好，并且非常容易扩展。但就如同你想象的那样，这当然也带来了令人着迷的挑战。
 
 ## 异步编程模型
@@ -522,4 +525,3 @@ await Async.Join(req1, req2);
 
 
 
-> 原文：[Asynchronous Everything](http://joeduffyblog.com/2015/11/19/asynchronous-everything/)

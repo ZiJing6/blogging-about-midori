@@ -1,5 +1,8 @@
 # 并发 15 年
 
+> 原文：[15 Years of Concurrency](http://joeduffyblog.com/2016/11/30/15-years-of-concurrency/)
+
+
 在[三种安全](https://github.com/ZiJing6/blogging-about-midori/blob/master/a_tale_of_three_safeties.md)中，我们讨论了三个种类的安全：类型、内存和并发。在这篇后续文章中,我们将深入最后一个,也许是最难的一个。并发安全性让我参与到 [Midori](https://github.com/ZiJing6/blogging-about-midori/blob/master/README.md) 项目，之前我在 .NET 和 c++ 的并发模型上花了多年的时间，让我最终加入进去。在这期间我们构建了一些伟大的的东西，让我非常自豪。也许某种程度上更有趣的，是在该项目已经过去几年之后，对这一段经历的反思。
 
 在今年的早些时候，我尝试了大概 6 次来写这篇文章，我很激动最后终于能够分享它。我希望这对感兴趣于这个领域的每个人都有用，特别是在这方面进行积极创新的人。虽然代码示例和经验教训深深根植于 C#、.NET 和 Midori 项目，但我已经试图将这些想法一般化，以便它们不受编程语言的影响。希望你们喜欢。
@@ -642,6 +645,3 @@ assert(await c.R > 0);
 利用数十年先前的研究的模式令人着迷，我很高兴我们采用了这种办法。我真的试图不发明新的东西。我曾经开玩笑说，我们的工作是筛选数十年的研究，并试图以新颖和创造性的方式结合它们。虽然听起来不那么令人向往，但现实就是，这是我们行业的大多数创新怎么产生的；在真空中发明出新的想法这事很少发生。
 
 无论如何，现在你得到了它。接下来的系列，我们将讨论与 GC 的战斗。
-
-
-> 原文：[15 Years of Concurrency](http://joeduffyblog.com/2016/11/30/15-years-of-concurrency/)
