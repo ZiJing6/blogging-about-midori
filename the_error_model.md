@@ -1447,7 +1447,7 @@ int[] xs = ...;
 string[] ys = try Map<int, string, throws>(xs, x => ...);
 ```
 
-请注意，throws 流过了，因此我们得以传递一个 throws 异常的回调。
+请注意，throws 流经了函数，因此我们得以传递一个 throws 异常的回调。
 
 作为一个整体，我们讨论要将这个更进一步，并允许程序员声明任意的影响。我[以前就假设过这样的系统](http://joeduffyblog.com/2010/04/25/from-simple-annotations-for-analysis-to-effect-typing/)。然而我们担心的是，这种高阶编程可能需要不必要的聪明并且难以理解，不管多么强大。上面的简单模型可能是甜区，如果给我们更多几个月的话，我们可能已经将它完成了。
 
