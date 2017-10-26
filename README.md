@@ -1,5 +1,8 @@
 # 关于 Midori 的博客
 
+> 原文：[Blogging about Midori](http://joeduffyblog.com/2015/11/03/blogging-about-midori/)
+
+
 应该已经过去了足够的时间了，现在提及我之前在微软的项目 “Midori” 应该没有问题了。接下来的几个月里，我将会发表大概十几篇文章，谈谈关于这个项目里面的内容，涉及一些很有趣的方面和要点。 
 
 “Midori” 是一个研究和孵化项目，用来探索贯穿整个微软软件栈的创新方法。这跨越了所有的方面，包括编程语言，编译器，操作系统，系统服务，应用，以及全部的编程模型。我们着重偏向于云、并发和安全。这个项目还包含特别的合作“文化”，100% 都是开发人员，而且非常关注代码，看起来很像现在的微软 —— 比起 8 年前这个项目刚开始时候的微软，希望也是以后的微软。
@@ -20,6 +23,3 @@
     7. [并发 15 年](https://github.com/ZiJing6/blogging-about-midori/blob/master/15_years_of_concurrency.md) （翻译完成）  
 
 Midori 是一段迷人的旅程，是我职业生涯里最开心的一段日子。我期待能够与你分享这一段旅程。 
-
-
-> 原文：[Blogging about Midori](http://joeduffyblog.com/2015/11/03/blogging-about-midori/)
