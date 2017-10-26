@@ -1379,13 +1379,37 @@ class MyComponent {
 
 先前我也已经提到了一个具体的例子，那是 try 一个新的内存分配的能力，当 OOM 发生，作为一个可修复的错误而不是丢弃。这非常罕见，但如果你想就可能会出现。比如说，为一些多媒体操作分配一个大的缓冲区。
 
-#### 监护者（Keeper）
+#### 守护者（Keeper）
 
-我覆盖的最后一个模式被称为_监护者模式_。
+我覆盖的最后一个模式被称为_守护者模式_。
 
 在许多情况下，处理可恢复异常的方式是“由里而外”的。一堆代码被调用，将参数传递下调用栈中，直到最终达到一些认为当前状态不可接受的代码为止。在异常模型中，控制流然后被传播回调用栈，解开，直到找到一些代码来处理这个错误。在那时如果需要对操作进行重试，这一串的调用必须重新发起，等等。
 
-另一种模式是使用监护者。监护者是一个了解如何“就地”从错误中恢复的对象，这样调用栈就不必被摊平开。相反，本来会抛出异常的代码会询问监护者，后者会指示代码如何继续。监护者的一个很好的方面是，当作为配置的能力完成时，周围的代码甚至不需要知道它们的存在 —— 不像在我们的系统中必须声明为类型系统的一部分的异常。监护者的另一个方面是简单而且低成本。
+另一种模式是使用守护者。守护者是一个了解如何“就地”从错误中恢复的对象，这样调用栈就不必被摊平开。相反，本来会抛出异常的代码会询问守护者，后者会指示代码如何继续。守护者的一个很好的方面是，当作为配置的能力完成时，周围的代码甚至不需要知道它们的存在 —— 不像在我们的系统中必须声明为类型系统的一部分的异常。守护者的另一个方面是简单而且低成本。
 
-Midori 中的监护者可以被用于立即操作，但更经常用于跨越异步边界的操作。
+Midori 中的守护者可以被用于立即操作，但更经常用于跨越异步边界的操作。
+
+守护者的典型示例是一个守护文件系统操作。访问文件和目录通常有以下失败模式：
+
+* 非法的路径规范。
+* 未找到文件。
+* 未找到目录。
+* 文件使用中。
+* 权限不足。
+* 磁盘已满。
+* 磁盘写保护。
+
+一种方式是为每个文件系统 API 声明一个 throws 子句。或者像 Java 那样，对每一种情况创建一个 IOException 子类层次。另一种方式是使用守护者。这可确保整个应用程序不需要知道或者关心 IO 错误，从而使恢复逻辑集中起来。这样的一个守护者接口可能像下面一样：
+
+```csharp
+async interface IFileSystemKeeper {
+    async string InvalidPathSpecification(string path) throws;
+    async string FileNotFound(string path) throws;
+    async string DirectoryNotFound(string path) throws;
+    async string FileInUse(string path) throws;
+    async Credentials InsufficientPrivileges(Credentials creds, string path) throws;
+    async string MediaFull(string path) throws;
+    async string MediaWriteProtected(string path) throws;
+}
+```
 
