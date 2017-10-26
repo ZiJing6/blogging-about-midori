@@ -1417,3 +1417,4 @@ async interface IFileSystemKeeper {
 
 最后，我需要指出的是，Windows 的结构化异常处理（SEH）系统支持“可继续”的异常，这种异常在概念上试图实现同样的事情。他们让一些代码决定如何重启断裂的计算。不幸的是，它们是使用调用栈上的环境处理器实现的，而不是语言中的头等对象，所以相对于守护者而言，远没有那么优雅，而且易于出错。
 
+> 原文：[The Error Model](http://joeduffyblog.com/2016/02/07/the-error-model)
