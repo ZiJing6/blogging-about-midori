@@ -1284,7 +1284,7 @@ x = tmp.Value;
 
 优化的编译器可以更有效地表示这一点，消除过多地复制。特别是使用内联。
 
-若你试图将 try/catch/finally 同样地建模，可能需要使用 goto，你立刻就能明白为什么编译器在优化 unchecked 异常时会那么困难。它们隐藏了控制流地边缘情况！
+若你试图将 try/catch/finally 同样地建模，可能需要使用 goto，你立刻就能明白为什么编译器在优化 unchecked 异常时会那么困难。它们隐藏了控制流的边缘情况！
 
 无论哪种方式，这个练习都非常生动地展示了返回代码的缺点。所有的那些粑粑 —— 原本很少会需要的（想一下，当然，失败是很少见的） —— 在热路径上，搞砸了你黄金路径的性能。这违反了我们最重要的原则之一。
 
@@ -1326,4 +1326,56 @@ Midori 所做的一个简单的改进是确保所有地异常相关基础结构�
 异常跟我们这里想要的东西很接近了。但不幸的是，栈中的代码可以捕获触发中的异常，从而有效地忽略了中止。我们需要某种不会被忽略的东西。
 
 进入中止。我们引入中止主要是为了支持我们使用函数式反应式编程（FRP）的 UI 框架，虽然这种模式有一些瑕疵。当一个 FRP 重新计算发生的时候，有可能有新的事件进入系统，或者做出了新的发现，使当前的计算无效。如果这种情况发生了 —— 通常发生在交错着用户代码和系统代码的计算的深度栈中 —— FRP 引擎需要快速地回到它的栈顶，在那它可以安全地开始重新计算。由于所有栈上的用户代码是纯函数的，在中途中止它是很容易做到的。不会留下错误的副作用。所有遍历的引擎代码都经过了仔细的审核和强化，归功于类型化的异常，以确保不变量的保持。
+
+中止的设计从[能力手册](https://github.com/ZiJing6/blogging-about-midori/blob/master/objects_as_secure_capabilities.md)中借用了一页。首先，我们引入了一个叫 AbortException 的基类。它可以直接使用或者通过子类型使用。其中一个是特别的：没有谁可以捕获并且忽略它。这个异常会在任何尝试捕获它的 catch 块之后重新触发。我们称这样的异常为_无可否定的_。
+
+但对于有人需要达成的中止。整个想法是从一个上下文中退出，而不是以丢弃的方式摧毁整个进程。而这就是能力进入画面的地方。下面是 AbortException 的基本构造：
+
+```csharp
+public immutable class AbortException : Exception {
+    public AbortException(immutable object token);
+    public void Reset(immutable object token);
+    // Other uninteresting members omitted...
+}
+```
+
+请注意，在构造时，就提供了一个不可变的 token；为了废除这次 throw，需要调用 Reset，而且必须提供一个相匹配的 token。如果 token 不匹配，就会发生丢弃。这个想法是，中止的抛出和意欲捕获部分通常是同一个，或者至少是互相串通的，这样互相安全地分享 token 是很容易做到的。这是实际中对象作为不可否定的能力的一个很好的例子。
+
+是的，栈上的任意代码都可以触发一个丢弃，但那样的代码已经可以通过简单的对 null 解引用来这样做了。这个技术阻止在还没有准备好的中止上下文执行。
+
+其他的框架也有类似的模式。.NET Framework 有 ThreadAbortException，它也是不可否定，除非你调用 Thread.ResetAbort；可悲的是，因为它不是基于能力的，所以需要一个笨拙的安全声明和宿主 API 来阻止意外的中止。经常这是未经检查的。
+
+由于异常是不可变的，以及上面的 token 也是不可变的，一个常用的模式是将这些东西缓存到静态变量中，使用 singleton。例如：
+
+```csharp
+class MyComponent {
+    const object abortToken = new object();
+    const AbortException abortException = new AbortException(abortToken);
+
+    void Abort() throws AbortException {
+        throw abortException;
+    }
+
+    void TopOfTheStack() {
+        while (true) {
+            // Do something that calls deep into some callstacks;
+            // deep down it might Abort, which we catch and reset:
+            let result = try ... else catch<AbortException>;
+            if (result.IsFailed) {
+                result.Exception.Reset(abortToken);
+            }
+        }
+    }
+}
+```
+
+这种模式让中止非常高效。平均每次 FRP 重新计算会被中止多次。记住，FRP 是系统中 UI 的骨干，所以由于异常导致的缓慢是不可接受的。即使分配一个异常对象也是不幸的，因为随口会发生的 GC 压力。
+
+#### 可选使用 “Try” API
+
+我提到过一些失败后会导致丢弃的操作。包括分配内存、执行溢出或者除 0 的算术运算等。在一些这种例子中，一小部分适用于动态错误传播和恢复，而不是丢弃。即使在普遍情况下丢弃更好。
+
+这形成了一个模式。不太常用，但它出现了。结果，我们有了一系列的运算 API，使用数据流风格的传播溢出、NaN、或者任何发生的事情。
+
+先前我也已经提到了一个具体的例子，那是 try 一个新的内存分配的能力，当 OOM 发生，作为一个可修复的错误而不是丢弃。这非常罕见，但如果你想就可能会出现。比如说，为一些多媒体操作分配一个大的缓冲区。
 
