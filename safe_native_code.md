@@ -7,5 +7,5 @@
 
 ## 概述
 
-当人们想到 C#、Java 以及相关的语言，他们通常想到的是即时（Just-In-Time(JIT)）编译。特别是在 Midori 开始时的 2000 年代中期。但 Midori 是不同的，从一开始就使用了更加类似 C++ 的提前（Ahead-Of-Time(AOT)）编译。
+当人们想到 C#、Java 以及相关的语言，他们通常想到的是[即时（Just-In-Time(JIT)）编译](https://en.wikipedia.org/wiki/Just-in-time_compilation)。特别是在 Midori 开始时的 2000 年代中期。但 Midori 是不同的，从一开始就使用了更加类似 C++ 的[提前（Ahead-Of-Time(AOT)）编译](https://en.wikipedia.org/wiki/Ahead-of-time_compilation)。
 
