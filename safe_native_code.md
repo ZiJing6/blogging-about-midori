@@ -17,3 +17,7 @@
 
 我得坦率地指出，与我们同时，外部世界在这一领域也取得了相当大的进展。[Go](https://golang.org/) 在系统性能和安全性之间有一个优雅的界限。[Rust](http://rust-lang.org/) 就是纯粹的超赞。[.NET Native](https://msdn.microsoft.com/en-us/vstudio/dotnetnative.aspx) 和相关的 [Android Runtime](https://en.wikipedia.org/wiki/Android_Runtime) 项目已经用一种更多限制的方式给 C# 和 Java 带来良好的 AOT 体验，作为一种“静默的”优化技术，以避免移动应用因为 JIT 时造成的卡顿。最近，我们正在致力于通过 [CoreRT 项目](https://github.com/dotnet/corert)将 AOT 带到更广泛的 .NET 环境中。通过这一努力，我希望我们能够将下面的一些经验教训带到现实世界中。由于打破了微妙的平衡，我们能走得多远还需要观望。我们花了好几年才让一切东西和谐工作起来，以数十人年为单位，然而，将知识转授也需要花费很多时间。
 
+首先的首先，让我们先快速回顾一下：本机语言和托管语言的区别到底是什么？
+
+### 哪些是一样的？
+
