@@ -31,3 +31,5 @@
 
 选择托管代码不会改变这里的任何一点。你仍然需要同样的灵活性。你在 C 和 C++ 编译器中使用来达成这个目的的技术绝大程度上跟使用在安全代码上的一样。
 
+你需要一个很棒的[内联处理器（inliner）](https://en.wikipedia.org/wiki/Inline_expansion)。你想要[公共子表达式消除（common subexpression elimination (CSE)）](https://en.wikipedia.org/wiki/Common_subexpression_elimination)，[常量传播和折叠（constant propagation and folding）](https://en.wikipedia.org/wiki/Constant_folding)，[强度降低（strength reduction）](https://en.wikipedia.org/wiki/Strength_reduction)，以及一个优秀的[循环优化器（loop optimizer）](https://en.wikipedia.org/wiki/Loop_optimization)。现在，你可能想要使用[静态单一赋值形式（static single assignment form (SSA)）](https://en.wikipedia.org/wiki/Static_single_assignment_form)，以及一些独特的 SSA 优化如[全局值编号（global value numbering）](https://en.wikipedia.org/wiki/Global_value_numbering)（虽然在到处使用 SSA 时你需要小心工作集和编译器吞吐量）。你需要对你很重要的目标架构的特定机器依赖的优化器，包括[寄存器分配器（register allocators）](https://en.wikipedia.org/wiki/Register_allocation)。最终，你将需要一个全局分析器来做过程间优化，链接时代码生成以扩展跨过程的过程间优化，一个应对现代处理器（SSE、NEON、AVX 等等）的[矢量化器（vectorizer）](https://en.wikipedia.org/wiki/Automatic_vectorization)，以及定义良好的[剖析引导优化（profile guided optimizations (PGO)）](https://en.wikipedia.org/wiki/Profile-guided_optimization)来在真实世界的场景中应用上面说的这些技术。
+
