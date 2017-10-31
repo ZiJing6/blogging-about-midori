@@ -19,7 +19,7 @@
 
 首先的首先，让我们先快速回顾一下：本机语言和托管语言的区别到底是什么？
 
-### 哪些是一样的？
+### 相同之处是什么？
 
 我鄙视“本机和托管”这种错误的二分法，所以我得为使用了这种说法而道歉。读了这篇文章之后，我希望能让你相信这是一个连续的东西。C++ 现在比以往变得更安全，与之对应的是 C# 的性能。有趣的是到底有多少经验教训被直接应用到我们团队这些天正在致力的安全 C++ 工作上。
 
@@ -32,4 +32,10 @@
 选择托管代码不会改变这里的任何一点。你仍然需要同样的灵活性。你在 C 和 C++ 编译器中使用来达成这个目的的技术绝大程度上跟使用在安全代码上的一样。
 
 你需要一个很棒的[内联处理器（inliner）](https://en.wikipedia.org/wiki/Inline_expansion)。你想要[公共子表达式消除（common subexpression elimination (CSE)）](https://en.wikipedia.org/wiki/Common_subexpression_elimination)，[常量传播和折叠（constant propagation and folding）](https://en.wikipedia.org/wiki/Constant_folding)，[强度降低（strength reduction）](https://en.wikipedia.org/wiki/Strength_reduction)，以及一个优秀的[循环优化器（loop optimizer）](https://en.wikipedia.org/wiki/Loop_optimization)。现在，你可能想要使用[静态单一赋值形式（static single assignment form (SSA)）](https://en.wikipedia.org/wiki/Static_single_assignment_form)，以及一些独特的 SSA 优化如[全局值编号（global value numbering）](https://en.wikipedia.org/wiki/Global_value_numbering)（虽然在到处使用 SSA 时你需要小心工作集和编译器吞吐量）。你需要对你很重要的目标架构的特定机器依赖的优化器，包括[寄存器分配器（register allocators）](https://en.wikipedia.org/wiki/Register_allocation)。最终，你将需要一个全局分析器来做过程间优化，链接时代码生成以扩展跨过程的过程间优化，一个应对现代处理器（SSE、NEON、AVX 等等）的[矢量化器（vectorizer）](https://en.wikipedia.org/wiki/Automatic_vectorization)，以及定义良好的[剖析引导优化（profile guided optimizations (PGO)）](https://en.wikipedia.org/wiki/Profile-guided_optimization)来在真实世界的场景中应用上面说的这些技术。
+
+虽然面对安全语言会在你的行进路上扔出一些独特有趣的香蕉球 —— 我下面会提及 —— 你仍需要所有的标准的优化编译器的东西。
+
+我不想这样说，但将所有这些东西都做好是“筹码”。早在 2000 年代中，我们不得不手写所有的东西。谢天谢地，现在你可以得到一个极好的现成的优化编译器，如 LLVM，其中大部分已经经过实战测试，准备就绪，而且并为你的改进做好了准备。
+
+### 不同之处是什么？
 
