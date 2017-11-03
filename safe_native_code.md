@@ -61,3 +61,10 @@
 
 ## 编译架构
 
+我们的架构涉及三大主要组件：
+
+* [C# 编译器](https://github.com/dotnet/roslyn)：执行词法分析、语句分析和语义分析。最终将 C# 文本源代码转化为基于 [CIL](https://en.wikipedia.org/wiki/Common_Intermediate_Language) 的[中间表示（intermediate representation (IR)）](https://en.wikipedia.org/wiki/Intermediate_language)。
+* [Bartok](https://en.wikipedia.org/wiki/Bartok_(compiler))：接受给定的 IR 进行高层次的基于 MSIL 的分析、转换和优化，最终将 IR 降低到更接近于更具体的机器表示。例如，使用 Bartok 处理完 IR 后，泛型就消失了。
+* [Phoenix](https://en.wikipedia.org/wiki/Phoenix_(compiler_framework))：接受上面的更低层次的 IR，并尽可能地处理它。这是大部分“油门到底”的优化发生的地方。输出是机器代码。
+
+
