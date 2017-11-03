@@ -101,3 +101,21 @@ for (int i = 0; i < 100; i++) {
 }
 ```
 
+这里是作为存在边界检查的循环内部访问生成的机器码的例子：
+
+```asm
+; 首先，将数组的长度放入 EAX：
+3B15: 8B 41 08        mov         eax,dword ptr [rcx+8]
+; 如果 EDX >= EAX，访问越界；跳到 error：
+3B18: 3B D0           cmp         edx,eax
+3B1A: 73 0C           jae         3B28
+; 否则，访问正常；计算元素地址并赋值：
+3B1C: 48 63 C2        movsxd      rax,edx
+3B1F: 8B 44 81 10     mov         dword ptr [rcx+rax*4+10h],r8d
+; ...
+; 错误处理；只是调用 runtime helper 进行 throws:
+3B28: E8 03 E5 FF FF  call        2030
+```
+
+若你在每个循环迭代中都做这个簿记（bookkeeping），你不会得到非常紧凑的循环代码。那你当然不会有任何向量化它的希望。所以，我们花了很多时间和精力来尝试消除这样的检查。
+
