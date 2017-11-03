@@ -67,4 +67,18 @@
 * [Bartok](https://en.wikipedia.org/wiki/Bartok_(compiler))：接受给定的 IR 进行高层次的基于 MSIL 的分析、转换和优化，最终将 IR 降低到更接近于更具体的机器表示。例如，使用 Bartok 处理完 IR 后，泛型就消失了。
 * [Phoenix](https://en.wikipedia.org/wiki/Phoenix_(compiler_framework))：接受上面的更低层次的 IR，并尽可能地处理它。这是大部分“油门到底”的优化发生的地方。输出是机器代码。
 
+这里跟 Swift 的编译器设计，尤其是 [SIL](http://llvm.org/devmtg/2015-10/slides/GroffLattner-SILHighLevelIR.pdf) 的相似之处是显而易见的。.NET Native 项目也多少照抄了这个架构。坦率地说，大多数针对高层次语言的 AOT 编译器都这样做。
+
+在大多数地方，编译器的内部表示使用了[静态单一赋值形式（SSA）](https://en.wikipedia.org/wiki/Static_single_assignment_form)。SSA 一直保留直到编译的很后期。这促进并改善了前面提到的很多经典编译器优化的使用。
+
+这个架构的目标包括：
+
+* 促进快速的原型和实验。
+* 生成跟商业 C/C++ 编译器同等水平的高质量机器代码。
+* 支持调试优化的机器代码以提高生产力。
+* 促进基于采样或/和检测的剖析引导优化代码。
+* 适合自托管（self-host）：
+    * 编译出来的编译器是足够快的。
+    * 足够快以让编译器开发人员乐于使用它。
+    * 当编译器出现情况时容易调试问题。
 
