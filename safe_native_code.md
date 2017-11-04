@@ -31,7 +31,7 @@
 
 选择托管代码不会改变这里的任何一点。你仍然需要同样的灵活性。你在 C 和 C++ 编译器中使用来达成这个目的的技术绝大程度上跟使用在安全代码上的一样。
 
-你需要一个很棒的[内联处理器（inliner）](https://en.wikipedia.org/wiki/Inline_expansion)。你想要[公共子表达式消除（common subexpression elimination (CSE)）](https://en.wikipedia.org/wiki/Common_subexpression_elimination)，[常量传播和折叠（constant propagation and folding）](https://en.wikipedia.org/wiki/Constant_folding)，[强度降低（strength reduction）](https://en.wikipedia.org/wiki/Strength_reduction)，以及一个优秀的[循环优化器（loop optimizer）](https://en.wikipedia.org/wiki/Loop_optimization)。现在，你可能想要使用[静态单一赋值形式（static single assignment form (SSA)）](https://en.wikipedia.org/wiki/Static_single_assignment_form)，以及一些独特的 SSA 优化如[全局值编号（global value numbering）](https://en.wikipedia.org/wiki/Global_value_numbering)（虽然在到处使用 SSA 时你需要小心工作集和编译器吞吐量）。你需要对你很重要的目标架构的特定机器依赖的优化器，包括[寄存器分配器（register allocators）](https://en.wikipedia.org/wiki/Register_allocation)。最终，你将需要一个全局分析器来做过程间优化，链接时代码生成以扩展跨过程的过程间优化，一个应对现代处理器（SSE、NEON、AVX 等等）的[矢量化器（vectorizer）](https://en.wikipedia.org/wiki/Automatic_vectorization)，以及定义良好的[剖析引导优化（profile guided optimizations (PGO)）](https://en.wikipedia.org/wiki/Profile-guided_optimization)来在真实世界的场景中应用上面说的这些技术。
+你需要一个很棒的[内联处理器（inliner）](https://en.wikipedia.org/wiki/Inline_expansion)。你想要[公共子表达式消除（common subexpression elimination (CSE)）](https://en.wikipedia.org/wiki/Common_subexpression_elimination)，[常量传播和折叠（constant propagation and folding）](https://en.wikipedia.org/wiki/Constant_folding)，[强度降低（strength reduction）](https://en.wikipedia.org/wiki/Strength_reduction)，以及一个优秀的[循环优化器（loop optimizer）](https://en.wikipedia.org/wiki/Loop_optimization)。现在，你可能想要使用[静态单赋值形式（static single assignment form (SSA)）](https://en.wikipedia.org/wiki/Static_single_assignment_form)，以及一些独特的 SSA 优化如[全局值编号（global value numbering）](https://en.wikipedia.org/wiki/Global_value_numbering)（虽然在到处使用 SSA 时你需要小心工作集和编译器吞吐量）。你需要对你很重要的目标架构的特定机器依赖的优化器，包括[寄存器分配器（register allocators）](https://en.wikipedia.org/wiki/Register_allocation)。最终，你将需要一个全局分析器来做过程间优化，链接时代码生成以扩展跨过程的过程间优化，一个应对现代处理器（SSE、NEON、AVX 等等）的[矢量化器（vectorizer）](https://en.wikipedia.org/wiki/Automatic_vectorization)，以及定义良好的[剖析引导优化（profile guided optimizations (PGO)）](https://en.wikipedia.org/wiki/Profile-guided_optimization)来在真实世界的场景中应用上面说的这些技术。
 
 虽然面对安全语言会在你的行进路上扔出一些独特有趣的香蕉球 —— 我下面会提及 —— 你仍需要所有的标准的优化编译器的东西。
 
@@ -69,7 +69,7 @@
 
 这里跟 Swift 的编译器设计，尤其是 [SIL](http://llvm.org/devmtg/2015-10/slides/GroffLattner-SILHighLevelIR.pdf) 的相似之处是显而易见的。.NET Native 项目也多少照抄了这个架构。坦率地说，大多数针对高层次语言的 AOT 编译器都这样做。
 
-在大多数地方，编译器的内部表示使用了[静态单一赋值形式（SSA）](https://en.wikipedia.org/wiki/Static_single_assignment_form)。SSA 一直保留直到编译的很后期。这促进并改善了前面提到的很多经典编译器优化的使用。
+在大多数地方，编译器的内部表示使用了[静态单赋值形式（SSA）](https://en.wikipedia.org/wiki/Static_single_assignment_form)。SSA 一直保留直到编译的很后期。这促进并改善了前面提到的很多经典编译器优化的使用。
 
 这个架构的目标包括：
 
@@ -129,3 +129,80 @@ for (int i = 0; i < 100; i++) {
 
 接下来，Phoenix 循环优化器开始着手处理东西。这层执行各种循环优化，以及跟本节内容最相关的范围分析。例如：
 
+* 循环实体化：这种分析实际上创建循环。它识别出若表示为循环会更理想的代码的重复模式，并在有收益时重写它们为循环。这包括展开（ unroll）手工（hand-rolled）的循环以便向量器能够处理它们，即使它们可能稍后会被重新展开（re-unroll）。
+* 循环克隆、展开以及版本化：这种分析创建循环的多个复制以进行专门化。包括循环展开、创建向量化的循环的特定架构的版本，等等。
+* [归纳（Induction）](https://en.wikipedia.org/wiki/Induction_variable)范围优化：这是我们在这节最关注的阶段。除了做经典的例如拓宽（widening）的归纳变量优化之外，的它使用归纳范围分析来消除不必要的检查。作为这一阶段的副产品，边界检查被消除和将它们提升到循环之外来合并。
+
+这些原则性的分析比前面所展示的更有威力。例如，有一些方法可以编写可以很容易“欺骗”前面所讨论的更基本的技术的早期循环代码：
+
+```csharp
+var a = new int[100];
+
+// Trick #1: use the length instead of constant.
+for (int i = 0; i < a.length; i++) {
+    a[i] = i;
+}
+
+// Trick #2: start counting at 1.
+for (int i = 1; i <= a.length; i++) {
+    a[i-1] = i-1;
+}
+
+// Trick #3: count backwards.
+for (int i = a.length - 1; i >= 0; i--) {
+    a[i] = i;
+}
+
+// Trick #4: don't use a for loop at all.
+int i = 0;
+next:
+if (i < a.length) {
+    a[i] = i;
+    i++;
+    goto next;
+}
+```
+
+你了解了这点。显然在某种程度上，你可以压榨优化器的能力来做任何事情，特别是当你开始在循环内部进行虚拟调用时，其中会丢掉别名信息。显然，当数组的长度不能静态地获知的时候，情况就变得更加困难，如上面例子的 100 所示。然而，如果你能证明循环范围和数组的关系，则所有的这些都不会丢失。这些分析的大部分都需要C# 的数组长度是不可变的事实的特别知识。
+
+在这些日子的最终，优化做得很好，这里是区别：
+
+```asm
+; Initialize induction variable to 0:
+3D45: 33 C0           xor         eax,eax
+; Put bounds into EDX:
+3D58: 8B 51 08        mov         edx,dword ptr [rcx+8]
+; Check that EAX is still within bounds; jump if not:
+3D5B: 3B C2           cmp         eax,edx
+3D5D: 73 13           jae         3D72
+; Compute the element address and store into it:
+3D5F: 48 63 D0        movsxd      rdx,eax
+3D62: 89 44 91 10     mov         dword ptr [rcx+rdx*4+10h],eax
+; Increment the loop induction variable:
+3D66: FF C0           inc         eax
+; If still < 100, then jump back to the loop beginning:
+3D68: 83 F8 64        cmp         eax,64h
+3D6B: 7C EB           jl          3D58
+; ...
+; Error routine:
+3D72: E8 B9 E2 FF FF  call        2030
+```
+
+以及下面的，完全优化的，没有边界检查的，循环：
+
+```asm
+; Initialize induction variable to 0:
+3D95: 33 C0           xor         eax,eax
+; Compute the element address and store into it:
+3D97: 48 63 D0        movsxd      rdx,eax
+3D9A: 89 04 91        mov         dword ptr [rcx+rdx*4],eax
+; Increment the loop induction variable:
+3D9D: FF C0           inc         eax
+; If still < 100, then jump back to the loop beginning:
+3D9F: 83 F8 64        cmp         eax,64h
+3DA2: 7C F3           jl          3D97
+```
+
+有趣的是，当我们使用 C++ 新的 array_view&lt;T> 类型进行同样的运用时，我感到似曾相识。有时候我和我的前 Midori 同事开玩笑，我们注定要在接下来的 10 年里慢慢地、耐心地重复自己的人生了。我知道这听起来很傲慢。但我几乎每天都有这种感觉。
+
+### 溢出检查
