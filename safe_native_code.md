@@ -211,3 +211,34 @@ if (i < a.length) {
 
 不管如何，如你所料，这同时也会降低代码质量。
 
+作为对比，假设我们将两个变量加起来：
+
+```csharp
+int x = ...;
+int y = ...;
+int z = x + y;
+```
+
+现在假设 x 在 ECX 中，而 y 在 EDX 中。下面是标准的 unchecked 加操作：
+
+```asm
+03 C2              add         ecx,edx
+```
+
+或者你想要更花哨一些，那个使用同一 LEA 指令也将结果存储在 EAX 寄存器中，跟很多现代编译器可能会做的那样：
+
+```asm
+8D 04 11           lea         eax,[rcx+rdx]
+```
+
+嗯，下面是插入了一个边界检查的等效代码：
+
+```asm
+3A65: 8B C1              mov         eax,ecx
+3A67: 03 C2              add         eax,edx
+3A69: 70 05              jo          3A70
+; ...
+3A70: E8 B3 E5 FF FF     call        2028
+```
+
+多出了那些可恶的条件跳转（JO）跟错误处理例程（CALL 2028）。
