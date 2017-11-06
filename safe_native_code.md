@@ -270,3 +270,60 @@ C# 数组不能有负的边界。如果编译器知道 DATA_SIZE 是足够小的
 
 ### 内联
 
+在大多数情况下，[内联](https://en.wikipedia.org/wiki/Inline_expansion)跟真正的本机代码是相同的。而且是同样的重要。经常是更为重要，因为 C# 开发人员倾向于编写大量小的方法（像属性访问器）。由于本文中的许多主题，要得到小的代码会比在 C++ 中更难 —— 更多的分支、更多的检查等等 —— 因此，实际上大多数托管代码的编译器比本机代码的编译器内联得少得多，或者至少需要做相当不同的调整。这回实际上严重影响和破坏性能。
+
+也有一些习惯性的膨胀的方面。在 MSIL 中 lambda 编码的方式对于一个本机后端编译器是无法理解的，除非这个事实使工程师幡然醒悟。例如，我们有一个优化接受这样的代码：
+
+```csharp
+void A(Action a) {
+    a();
+}
+
+void B() {
+    int x = 42;
+    A(() => x++);
+    ...
+}
+```
+
+而在内联之后，可以将 B 转化为这样：
+
+```csharp
+void B() {
+    int x = 43;
+    ...
+}
+```
+
+Action 参数是个 lambda 表达式，如果你知道 C# 编译器是如何将 lambda 编码成 MSIL，就会了解这个技巧是多么困难。作为例子，下面是 B 生成的代码：
+
+```msil
+.method private hidebysig instance void
+    B() cil managed
+{
+    // Code size       36 (0x24)
+    .maxstack  3
+    .locals init (class P/'<>c__DisplayClass1' V_0)
+    IL_0000:  newobj     instance void P/'<>c__DisplayClass1'::.ctor()
+    IL_0005:  stloc.0
+    IL_0006:  nop
+    IL_0007:  ldloc.0
+    IL_0008:  ldc.i4.s   42
+    IL_000a:  stfld      int32 P/'<>c__DisplayClass1'::x
+    IL_000f:  ldarg.0
+    IL_0010:  ldloc.0
+    IL_0011:  ldftn      instance void P/'<>c__DisplayClass1'::'<B>b__0'()
+    IL_0017:  newobj     instance void [mscorlib]System.Action::.ctor(object,
+                                                                  native int)
+    IL_001c:  call       instance void P::A(class [mscorlib]System.Action)
+    IL_0021:  nop
+    IL_0022:  nop
+    IL_0023:  ret
+}
+```
+
+要获得这个魔术般的结果，需要常量传播 ldftn，识别出委托构造是如何工作的（IL_0017），利用这信息来内联 B 并一起消除 lambda/delegate，然后再主要通过常量传播，折叠算术到用常数 42 做 x 的初始化。这种“掉到”多个不同关注点的优化的组合的情况，我总是发现的它的优雅。
+
+与本机代码一样，剖析引导优化（PGO）方式使我们的内联决策更加有效。
+
+### 结构（Struct）
