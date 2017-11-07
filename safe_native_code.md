@@ -327,3 +327,67 @@ Action 参数是个 lambda 表达式，如果你知道 C# 编译器是如何将 
 与本机代码一样，剖析引导优化（PGO）方式使我们的内联决策更加有效。
 
 ### 结构（Struct）
+
+CLI 结构几乎就跟 C 的结构一样，除了它们不是。CLI 强制了一些引起开销的语义。这些开销几乎总是表现为过度复制。更糟糕的是，这些复制通常在你的程序中是隐藏起来的。这是毫无意义的。因为复制构造和构析，C++ 也有一些真正的问题，通常比我要描述的更糟。
+
+也许最烦人的是，用 CLI 的方式初始化一个结构需要一个防卫性的复制。例如，考虑这个程序，S 的初始函数抛出了一个异常：
+
+```csharp
+class Program {
+    static void Main() {
+        S s = new S();
+        try {
+            s = new S(42);
+        }
+        catch {
+            System.Console.WriteLine(s.value);
+        }
+    }
+}
+
+struct S {
+    public int value;
+    public S(int value) {
+        this.value = value;
+        throw new System.Exception("Boom");
+    }
+}
+```
+
+这个程序的行为必须是值 0 被写到控制台中。在实践中，这意味着赋值操作 s = new S(42) 必须首先在栈上创建一个新的 S 类型的槽，构造它，并且_然后_而且只有在然后才将这个值复制回 s 变量中。对于这样的只有一个 int 的结构，这没什么大不了的。对于大的结构，这意味着要诉诸于 memcpy。在 Midori 中，由于我们的错误模型（以后会讲及更多），我们知道什么方法会 throw，而哪些不会，意味着我们可以在几乎所有情况下避免这种开销。
+
+另一个烦人的情况像下面这样：
+
+```csharp
+struct S {
+    // ...
+    public int Value { get { return this.value; } }
+}
+
+static readonly S s = new S();
+```
+
+每一次我们读取 s.Value：
+
+```csharp
+int x = s.Value;
+```
+
+我们都会得到一个本地的副本。这项实际上只会在 MSIL 中才能看出来。这是没有 readonly 的：
+
+```csharp
+ldsflda    valuetype S Program::s
+call       instance int32 S::get_Value()
+```
+
+而这个是有 readonly 的：
+
+```csharp
+ldsfld     valuetype S Program::s
+stloc.0
+ldloca.s   V_0
+call       instance int32 S::get_Value()
+```
+
+请注意编译器选择使用 ldsfld，再跟一个 ldloca.s，而不是像第一个示例那样用 ldsflda 直接加载地址。由此产生的节气代码甚至更加糟糕。正如我后面会提及的那样，我也不能通过引用来传递结构，必须复制它，也可能出现问题。
+
