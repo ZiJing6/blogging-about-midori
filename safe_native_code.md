@@ -473,3 +473,7 @@ struct U {
 
 在某个时刻，我们意识到我们镜像大小的 40% 是 [vtable](https://en.wikipedia.org/wiki/Virtual_method_table)。我们不停地努力琢磨这个，在这之后，我们仍然有很多改进的余地。
 
+每个 vtable 都使用镜像的空间来保存在调用时使用的虚函数的指针，当然还有运行时的表示。每个拥有 vtable 的对象同时还有一个嵌入它的 vtable 指针。所以，如果你对大小（镜像的和运行时的）很在意，你得注意 vtable。
+
+在 C++ 中，你只会在你的类型是[多态](http://www.cplusplus.com/doc/tutorial/typecasting/)时才会有 vtable。在 C# 和 Java 这样的语言中，即使你不想、不需要或者不去使用它，也还是会有一个 vtable。在 C# 中，至少你可以用一个 struct 类型来去掉它们。我真的很喜欢 Go 的这方面，其中你通过接口来得到类似虚拟调用的东西，而不需要每个类型都有 vtable 的花销；你只需要为你使用的东西付出，在将某个东西硬变成 interface 的时候。
+
