@@ -471,3 +471,5 @@ struct U {
 
 实际上，我们还删掉了 System.Type 中的一大块。没有 Assembly，没有 BaseType，而且甚至没有 FullName。.NET Framework 的 mscorlib.dll 包含了约 100KB 的净的类型名称。当然，名称是有用，但我们的事件框架利用代码生成来生成在运行时实际需要的那些东西。
 
+在某个时刻，我们意识到我们镜像大小的 40% 是 [vtable](https://en.wikipedia.org/wiki/Virtual_method_table)。我们不停地努力琢磨这个，在这之后，我们仍然有很多改进的余地。
+
