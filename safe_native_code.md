@@ -445,3 +445,23 @@ struct T {
 
 我们会在 List&lt;S> 和 List&lt;T> 中共享实例化。
 
+你也许没有意识到这一点，但 C# 生成保证 struct 有顺序布局的 IL：
+
+```msil
+.class private sequential ansi sealed beforefieldinit S
+    extends [mscorlib]System.ValueType
+{
+    ...
+}
+```
+
+因此，我们不能让 List&lt;S> 和 List&lt;T> 与某些例如的 List&lt;U> 共享实例化：
+
+```csharp
+struct U {
+    int G;
+    object H;
+    object I;
+}
+```
+
