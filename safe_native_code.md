@@ -477,3 +477,8 @@ struct U {
 
 在 C++ 中，你只会在你的类型是[多态](http://www.cplusplus.com/doc/tutorial/typecasting/)时才会有 vtable。在 C# 和 Java 这样的语言中，即使你不想、不需要或者不去使用它，也还是会有一个 vtable。在 C# 中，至少你可以用一个 struct 类型来去掉它们。我真的很喜欢 Go 的这方面，其中你通过接口来得到类似虚拟调用的东西，而不需要每个类型都有 vtable 的花销；你只需要为你使用的东西付出，在将某个东西硬变成 interface 的时候。
 
+C# 中另一个 vtable 问题是所有的对象都从 System.Object 中继承了三个虚拟方法：Equals、GetHashCode 和 ToString。除了这点，这些方法通常不会用正确的方法干正确的事情 —— Equals 需要反射来用在值类型上，GetHashCode 是不确定的并且标记对象头（或者同步块；迟点会谈更多），而 ToString 没有提供格式化和本地化控制 —— 它们也给每个 vtable 膨胀了三个槽。这可能听起来好像不是太多，但它肯定比没有这种开销的 C++ 多。
+
+我们还剩下的主要苦恼来源是 C# 中的假定，坦率地说大多数 OOP 语言如 C++ 和 Java，[RTTI](https://en.wikipedia.org/wiki/Run-time_type_information) 对向下转换总是可用的。因为上面的那些原因，这在泛型中就特别痛苦。虽然我们积极地共享实例化，但我们不可能完全折叠这些家伙的类型结构，即使不同的实例化往往是相同的，或者至少是非常相似的。如果我可以从头全部再来一次，我会干掉 RTTI。在 90% 情况下，可区分类型联合（type discriminated union）或模式匹配（pattern matching）是更合适的解决方案。
+
+### 剖析引导优化（Profile guided optimizations (PGO)）
