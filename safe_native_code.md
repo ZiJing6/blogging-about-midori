@@ -445,7 +445,7 @@ struct T {
 
 我们会在 List&lt;S> 和 List&lt;T> 中共享实例化。
 
-你也许没有意识到这一点，但 C# 生成保证 struct 有顺序布局的 IL：
+你也许没有意识到这一点，但 C# 生成保证 struct 有 sequential 布局的 IL：
 
 ```msil
 .class private sequential ansi sealed beforefieldinit S
@@ -464,4 +464,8 @@ struct U {
     object I;
 }
 ```
+
+因为这个，除了其他原因之外 —— 像给编译器在填充、缓存对齐等等方面更多的灵活性 —— 我们在我们的语言中将 struct 默认设为 auto。事实上，sequential 只在如果你在用 unsafe 代码时才有关系，而在我们的编程模型中，这是不允许的。
+
+在 Midori 中我们不支持反射。原则上，我们有最终完成它的计划，作为一个纯可选的特性。在实践中，我们从来就不需要它。我们发现代码生成从来都是更为适合的方案。通过这样我们最好情况下比 C# 的镜像大小剔掉至少 30%。如果你在系统中跟大多数情况一样保留所有的 MSIL，还会显著更多，即使是在 NGen 和 .NET AOT 方案中。
 
