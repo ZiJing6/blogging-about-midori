@@ -493,3 +493,7 @@ C# 中另一个 vtable 问题是所有的对象都从 System.Object 中继承了
 
 ## 系统架构
 
+上面描述的基础都很重要。但一些更具影响力的领域需要更深层次的跟语言、runtime、framework 以及操作系统自身的架构的协同设计和协同进化。我[曾经写过这种“整个系统”方法的巨大好处](http://joeduffyblog.com/2014/09/10/software-leadership-7-codevelopment-is-a-powerful-thing/)。这是一种魔法般的不可思议。
+
+### GC
+
