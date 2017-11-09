@@ -482,3 +482,14 @@ C# 中另一个 vtable 问题是所有的对象都从 System.Object 中继承了
 我们还剩下的主要苦恼来源是 C# 中的假定，坦率地说大多数 OOP 语言如 C++ 和 Java，[RTTI](https://en.wikipedia.org/wiki/Run-time_type_information) 对向下转换总是可用的。因为上面的那些原因，这在泛型中就特别痛苦。虽然我们积极地共享实例化，但我们不可能完全折叠这些家伙的类型结构，即使不同的实例化往往是相同的，或者至少是非常相似的。如果我可以从头全部再来一次，我会干掉 RTTI。在 90% 情况下，可区分类型联合（type discriminated union）或模式匹配（pattern matching）是更合适的解决方案。
 
 ### 剖析引导优化（Profile guided optimizations (PGO)）
+
+我已经提到过[剖析引导优化](https://en.wikipedia.org/wiki/Profile-guided_optimization)（PGO）。这是在几乎所有其他这篇文章中的东西都完全做了之后的最后一公里的关键因素。这让我们的浏览器程序在像 [SunSpider](https://webkit.org/perf/sunspider/sunspider.html) 和 [Octane](https://developers.google.com/octane/) 之类的基准测试中获得了将近 30-40% 的提升。
+
+大多数使用 PGO 的方式跟经典的本机 profiler 一样，不过有两个大的不同。
+
+首先，我们教会了 PGO 关于本文中列出的许多独特的优化，譬如异步栈探查、泛型实例化、lambda、以及更多。跟其他很多事情一样，这里我们可以永远干下去。
+
+其次，除了普通的检查分析（instrumented profiling）外，我们试验了采样分析（sample profiling）。从开发人员的角度来看，这就好得多 —— 它们不需要两次 build —— 而且也让你从真实的、活生生在数据中心跑着的系统上收集数据。一个关于能达到什么样的可能性的好例子来自[这篇 Google-Wide Profiling(GWP) 论文](http://static.googleusercontent.com/media/research.google.com/en/us/pubs/archive/36575.pdf)。
+
+## 系统架构
+
