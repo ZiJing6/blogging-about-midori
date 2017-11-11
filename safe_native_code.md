@@ -537,3 +537,5 @@ object Test(out bool b);
 
 单独编译面向对象的 API 很困难。实话说，很少有人真的让它做成了。问题包括[脆弱基类问题](https://en.wikipedia.org/wiki/Fragile_base_class)，这对于弹性版本库是真正的杀手。因此，大多数现实的系统在组件的边界之间使用一个简化的“[C ABI](https://en.wikipedia.org/wiki/Application_binary_interface)”。作为例子，这是为什么 Windows，历史上使用扁平的 C Win32 API，而且即使通过 WinRT 变得更加面向对象，还是所有东西的下面使用 COM 。付出一些运行时的开销后，ObjectiveC runtime 解决了这个挑战。就像大多数计算机科学里的东西一样，几乎所有的问题都可以用多的间接的一层来解决；[这个问题也可以](http://www.sealiesoftware.com/blog/archive/2009/01/27/objc_explain_Non-fragile_ivars.html)。
 
+我们在 Midori 中使用的设计支点是所有的进程都是 sealed 的。没有动态加载，所以没有看起来像经典的 dll 和 SO 的东西。对于那些场景，我们使用[异步一切](https://github.com/ZiJing6/blogging-about-midori/blob/master/asynchronous_everything.md)的编程模型，使得动态连接到以及使用分开编译和版本化的进程很容易。
+
