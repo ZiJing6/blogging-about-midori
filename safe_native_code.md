@@ -535,3 +535,5 @@ object Test(out bool b);
 
 作为开始的基本模型是静态链接。在这模型中，你将所有的内容编译为单个可执行文件。这样做的好处是显而易见的：它简单，易于理解，服务的概念直接，而且整个编译工具链的工作更少。老实说，鉴于到以 Docker 容器作为服务单元的转移，这种模型现在越来越有意义了。但对于整个操作系统，在某种程度上，你需要分别编译。不只是因为当静态链接一整个操作系统会导致编译时间相当长，还因为生成的进程的工作集和占用空间会有大量重复。
 
+单独编译面向对象的 API 很困难。实话说，很少有人真的让它做成了。问题包括[脆弱基类问题](https://en.wikipedia.org/wiki/Fragile_base_class)，这对于弹性版本库是真正的杀手。因此，大多数现实的系统在组件的边界之间使用一个简化的“[C ABI](https://en.wikipedia.org/wiki/Application_binary_interface)”。作为例子，这是为什么 Windows，历史上使用扁平的 C Win32 API，而且即使通过 WinRT 变得更加面向对象，还是所有东西的下面使用 COM 。付出一些运行时的开销后，ObjectiveC runtime 解决了这个挑战。就像大多数计算机科学里的东西一样，几乎所有的问题都可以用多的间接的一层来解决；[这个问题也可以](http://www.sealiesoftware.com/blog/archive/2009/01/27/objc_explain_Non-fragile_ivars.html)。
+
