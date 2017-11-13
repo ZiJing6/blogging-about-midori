@@ -547,3 +547,10 @@ object Test(out bool b);
 
 这把我带到了泛型。它们将一个扳手扔到了所有东西里。
 
+问题在于，除非你实现一个[擦除模型](https://docs.oracle.com/javase/tutorial/java/generics/erasure.html) —— 这由于装箱分配、间接性、或这两者会有，在性能表现上很糟 —— 你没有办法有可能在 AOT 时实现实例化所有可能的版本。譬如，假设你提供了一个 List&lt;T>，你怎么知道使用你的库的人需要的是 List&lt;int>、List&lt;string> 还是 List&lt;SomeStructYouveNeverHeardOf>？
+
+解决方案很丰富：
+1. 不特化。擦除所有类型。
+2. 只特化实例化的一个子集，对于其余的创建擦除实例化。
+3. 特化所有的东西。这有最佳的性能，但有些复杂。
+
