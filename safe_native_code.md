@@ -560,3 +560,4 @@ Java 使用了 #1 方案（实际上，擦除被烤进了语言中）。很多 M
 
 假设你有一个菱形。库 A 导出一个 List&lt;T> 类型，而库 B 和 C 都实例化了 List&lt;int>。程序 D 同时使用 B 和 C 而且可能将返回的 List&lt;T> 对象在它们两个中传递。这样我们应该如何确保 List&lt;int> 的版本是兼容的？
 
+我们称这个问题为*潜在的多样实例化*（*potentially multiply instantiated*）问题，简称 PMI。
