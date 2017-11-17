@@ -655,3 +655,7 @@ E8 DD E0 FF FF       call        2048
 
 当然，所有的静态成员仍然引致这样的检查，即使是采用 beforefieldinit。
 
+虽然 C++ 没有遭受同样的问题，它的确有令人头疼的[初始化顺序语义](http://en.cppreference.com/w/cpp/language/initialization)。而且，像 C# 的 static 一样，C++11 引入了线程安全的初始化，通过[“magic statics”特性](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2660.htm)。
+
+在 Midori 中我们几乎清掉了这个烂摊子。
+
