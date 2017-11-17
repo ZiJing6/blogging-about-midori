@@ -592,3 +592,66 @@ CLR 通过在运行时统一实例化来解决这个问题。所有的 RTTI 数�
 
 当我知道我们代码大小的 10% 用于静态初始化检查时，我惊呆了。
 
+很多人可能没意识到 [CLI 规范](http://www.ecma-international.org/publications/standards/Ecma-335.htm)提供了两种静态初始化模式。默认模式和 beforefieldinit。默认模式跟 Java 的一样，而且很可怕。静态初始化程序必须只在访问类型的任何静态字段、类型的任何静态方法、类型的任何实例或者虚拟方法（如果是值类型）、或者任何构造函数之前运行。“何时”部分没有它要做的“什么”那么重要；现在*所有*这些地方在生成的机器代码中都需要使用显式的惰性初始化检查来保证！
+
+beforefieldinit 稍微宽松点。它保证初始程序将在实际访问类型的静态字段之前的某个时刻运行。这给编译器在决定这个位置时有较大的回旋余地。幸运的是 C# 编译器将自动为你选择 beforefieldinit，你应该坚持只用字段初始化。然而，大多数人没有意识到选择取代之以静态构造函数的难以置信的代价，特别是对于值类型，其中突然所有的方法调用都会引致初始化防御。代码上只是有一点区别：
+
+```csharp
+struct S {
+    static int Field = 42;
+}
+```
+
+及
+
+```csharp
+struct S {
+    static int Field;
+    static S() {
+        Field = 42;
+    }
+}
+```
+
+现在，假如这个 struct 有一个属性：
+
+```csharp
+struct S {
+    // As above...
+    int InstanceField;
+    public int Property { get { return InstanceField; } }
+}
+```
+
+下面是如果 S 没有静态构造方法或者使用 beforefieldinit （在上面的字段初始化示例代码中会被 C# 自动使用）时的 Property 的机器代码：
+
+```asm
+; The struct is one word; move its value into EAX, and return it:
+8B C2                mov         eax,edx
+C3                   ret
+```
+
+而下面是如果你加了一个类构造方法会发生的：
+
+```asm
+; Big enough to get a frame:
+56                   push        rsi
+48 83 EC 20          sub         rsp,20h
+; Load the field into ESI:
+8B F2                mov         esi,edx
+; Load up the cctor's initialization state:
+48 8D 0D 02 D6 FF FF lea         rcx,[1560h]
+48 8B 09             mov         rcx,qword ptr [rcx]
+BA 03 00 00 00       mov         edx,3
+; Invoke the conditional initialization helper:
+E8 DD E0 FF FF       call        2048
+; Move the field from ESI into EAX, and return it:
+8B C6                mov         eax,esi
+48 83 C4 20          add         rsp,20h
+5E                   pop         rsi
+```
+
+在每一个属性访问时！
+
+当然，所有的静态成员仍然引致这样的检查，即使是采用 beforefieldinit。
+
