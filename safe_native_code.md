@@ -667,3 +667,19 @@ E8 DD E0 FF FF       call        2048
 
 ### 异步模型
 
+关于[我们的异步模型](https://github.com/ZiJing6/blogging-about-midori/blob/master/asynchronous_everything.md)我已经写了很多。我不会在这里重述所有这些。我将重申一点：编译器是让链接栈起效的关键。
+
+在链接栈模型中，编译器需要在代码中插入检查可用栈空间的探针。如果没有足够的的空间去执行某些操作 —— 执行一个函数调用、在栈上动态分配等 —— 编译器需要安排一个新的链接来加进来，并切换到它。大多数情况下这意味着一些范围检查、对运行时函数的条件调用、以及对 RSP 进行修补。一个探针的样子如下：
+
+```asm
+; Check amount of stack space:
+    lea     rax, [rsp-250h]
+    cmp     rax, qword ptr gs:[0]
+    ja      prolog
+; If insufficient stack, link a new segment:
+    mov     eax, 10029h
+    call    ?g_LinkNewStackTrampoline
+prolog:
+; The real code goes here...
+```
+
