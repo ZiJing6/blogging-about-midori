@@ -712,3 +712,7 @@ Midori 在[安全并发](https://github.com/ZiJing6/blogging-about-midori/blob/m
 
 但这也意味着编译器可以自由地进行[更加积极的代码移动优化](https://www.cs.princeton.edu/courses/archive/fall10/cos597C/docs/memory-models.pdf)，而无需牺牲这种高生产力的编程模型。换句话说，我们得到了两个世界中最好的部分。
 
+少部分内核开发人员必须考虑底层机器的内存顺序模型，他们是实现异步模型本身的人。为此，我们去掉了 C# 中的 volatile 的概念 —— 无论如何[它都被完全破坏了](http://joeduffyblog.com/2010/12/04/sayonara-volatile/) —— 更倾向于类似 C++ 的 [atomics](http://en.cppreference.com/w/cpp/atomic) 的东西。这个模型相当棒，有两个原因：首先，对于每个读和写，你需要的栅栏类型是显式的，这是真正重要的。（栅栏影响变量的使用，而不是声明）。其次，显式模型告知编译器关于什么优化能采用或不能的更多的信息，再加上特定的使用，这是最重要的。
+
+### 错误模型
+
