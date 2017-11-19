@@ -704,3 +704,11 @@ lea     rsp, [rbp-50h]
 
 ### 内存顺序模型
 
+Midori 在[安全并发](https://github.com/ZiJing6/blogging-about-midori/blob/master/a_tale_of_three_safeties.md)上的平台真的有一个令人惊叹的好处：你可以*毫无代价*地获得一个[顺序一致](https://en.wikipedia.org/wiki/Sequential_consistency)的内存顺序模型。你可能想再读一遍。毫无代价！
+
+为什么能这样？首先，Midori 的[进程模型](https://github.com/ZiJing6/blogging-about-midori/blob/master/asynchronous_everything.md)确保默认是单线程运行的。其次，进程内部的任何细粒度的并行被一定数量的 API 组织起来的，它们全都是无竞争的。竞争的缺少因为这我们可以选择性地在 fork 和 join 点上插入栅栏（fence），无需开发人员需要关心或者知道。
+
+显然，这对开发人员的生产力有着难以置信的好处。Midori 程序员从不会被内存重排序问题恶心过的这个事实，当然是我对这个项目最自豪的成果之一。
+
+但这也意味着编译器可以自由地进行[更加积极的代码移动优化](https://www.cs.princeton.edu/courses/archive/fall10/cos597C/docs/memory-models.pdf)，而无需牺牲这种高生产力的编程模型。换句话说，我们得到了两个世界中最好的部分。
+
