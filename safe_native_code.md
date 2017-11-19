@@ -672,11 +672,11 @@ E8 DD E0 FF FF       call        2048
 在链接栈模型中，编译器需要在代码中插入检查可用栈空间的探针。如果没有足够的的空间去执行某些操作 —— 执行一个函数调用、在栈上动态分配等 —— 编译器需要安排一个新的链接来加进来，并切换到它。大多数情况下这意味着一些范围检查、对运行时函数的条件调用、以及对 RSP 进行修补。一个探针的样子如下：
 
 ```asm
-; Check amount of stack space:
+; 检查栈空间的大小:
     lea     rax, [rsp-250h]
     cmp     rax, qword ptr gs:[0]
     ja      prolog
-; If insufficient stack, link a new segment:
+; 如果栈空间不足，链接到新段:
     mov     eax, 10029h
     call    ?g_LinkNewStackTrampoline
 prolog:
