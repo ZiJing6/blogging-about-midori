@@ -716,3 +716,5 @@ Midori 在[安全并发](https://github.com/ZiJing6/blogging-about-midori/blob/m
 
 ### 错误模型
 
+我们的错误模型旅程是一个相当漫长的旅程，会是将来一篇文章的主题。总之，我们用光谱的两端来做了试验 —— 异常和返回码 —— 以及中间的许多点。
+
