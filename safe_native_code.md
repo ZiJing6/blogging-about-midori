@@ -749,3 +749,49 @@ Midori 在[安全并发](https://github.com/ZiJing6/blogging-about-midori/blob/m
 最后，我们最终得到的是我所用过的最健壮的错误模型，当然也是性能最好的一个。
 
 ### 约定（Contract）
+
+如上所述，Midori 的编程语言有头等公民的 contract：
+
+```csharp
+void Push(T element)
+    requires element != null
+    ensures this.Count == old.Count + 1
+{
+        ...
+}
+```
+
+模型很简单：
+* 默认，所有的 contract 是在运行时进行检查的。
+* 编译器可以任意证明 contract 不满足，并抛出编译时错误。
+* 编译器可以任意证明 contract 满足，并溢出这些运行时检查。
+
+我们有条件编译模型，然而我现在会跳过它。后面我一个关于我们语言的文章会说这个。
+
+在早期，我们用如 MSR 的 [Clousot](http://research.microsoft.com/pubs/138696/Main.pdf) 的 contract 分析器做了尝试，以证明 contract。然而，由于编译时的原因，我们不得不放弃了这个方法。事实证明，编译器已经非常擅长于处理简单的 contract 求解和传播。所以最终我们只是将约定建模成编译器知道的事实，并让它当需要的时候插入检查。
+
+例如，使用上述范围信息完成的循环优化器已经可以利用像这样的检查：
+
+```csharp
+void M(int[] array, int index) {
+    if (index >= 0 && index < array.Length) {
+        int v = array[index];
+        ...
+    }
+}
+```
+
+来消除在保护性的 if 语句后的冗余边界检查。所以为什么不在这里也这样做呢？
+
+```csharp
+void M(int[] array, int index)
+        requires index >= 0 && index < array.Length {
+    int v = array[index];
+    ...
+}
+```
+
+然而，当设计到单独编译时，这些事实是特别的。一个约定是一个方法签名的一部分，我们的系统确保适当的[子类型替代](https://en.wikipedia.org/wiki/Liskov_substitution_principle)，让编译器在单独编译的边界上进行更为激进的优化。而且它可以更快地进行这些优化，因为它们不依赖于全局分析。
+
+### 对象和分配
+
