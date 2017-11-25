@@ -51,4 +51,4 @@ Midori 之后，我一直致力于将怎样同时实现安全和高效（perform
 
 内存、类型和并发安全的组合给了我们一个有力的基础。最重要的是，它提高了开发人员的生产力，让我们能更快地前进。极高成本的缓冲区溢出、数据竞争、死锁之类的玩意，就根本不会发生。总有一天，所有的操作系统都会用这种方式编写。
 
-在这系列的下一篇文章中，我们将会看看这些安全性基础如何让我们带来作为编程模型和类型系统头等公民的[基于能力的安全模型](https://en.wikipedia.org/wiki/Capability-based_security)，并带来同样“通过构造（by-construction）”的解决方案，以消除 [环境权限（ambient authority）](https://en.wikipedia.org/wiki/Ambient_authority)，默认情况下，在任何地方使用[最小权限原则](https://en.wikipedia.org/wiki/Principle_of_least_privilege)。下次见。  
+在这系列的下一篇文章中，我们将会看看这些安全性基础如何让我们带来作为编程模型和类型系统头等公民的[基于功能的安全模型](https://en.wikipedia.org/wiki/Capability-based_security)，并带来同样“通过构造（by-construction）”的解决方案，以消除 [环境权限（ambient authority）](https://en.wikipedia.org/wiki/Ambient_authority)，默认情况下，在任何地方使用[最小权限原则](https://en.wikipedia.org/wiki/Principle_of_least_privilege)。下次见。  
