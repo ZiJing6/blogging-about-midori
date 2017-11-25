@@ -3,7 +3,7 @@
 > 原文：[A Tale of Three Safeties](http://joeduffyblog.com/2015/11/03/a-tale-of-three-safeties/)
 
 
-Midori 是在三种安全性的基础上建立的：类型、内存以及并发安全性。这些安全性“通过构造（by-construction）”消除了一整类的 bug，而且在可靠性、安全性、开发人员生产力方面带来了巨大的提升。而且它们从基础上允许我们用一种新的更强有力的方式去依赖类型系统，去带来新的抽象，去完成创新的编译器优化，还有更多。再回过头看，我们项目最大的贡献是证明了，整个操作系统和它的系统服务、应用和类库生态系统能全都用安全代码写出来，而且没有性能损失，在若干重要的维度还有一些数量级的领先。
+Midori 是在三种安全性的基础上建立的：类型、内存以及并发安全性。这些安全性“从根子上（by-construction）”消除了一整类的 bug，而且在可靠性、安全性、开发人员生产力方面带来了巨大的提升。而且它们从基础上允许我们用一种新的更强有力的方式去依赖类型系统，去带来新的抽象，去完成创新的编译器优化，还有更多。再回过头看，我们项目最大的贡献是证明了，整个操作系统和它的系统服务、应用和类库生态系统能全都用安全代码写出来，而且没有性能损失，在若干重要的维度还有一些数量级的领先。
 
 首先，让我们定义这三种安全性，根据基础性来排序：
 
@@ -51,4 +51,4 @@ Midori 之后，我一直致力于将怎样同时实现安全和高效（perform
 
 内存、类型和并发安全的组合给了我们一个有力的基础。最重要的是，它提高了开发人员的生产力，让我们能更快地前进。极高成本的缓冲区溢出、数据竞争、死锁之类的玩意，就根本不会发生。总有一天，所有的操作系统都会用这种方式编写。
 
-在这系列的下一篇文章中，我们将会看看这些安全性基础如何让我们带来作为编程模型和类型系统头等公民的[基于功能的安全模型](https://en.wikipedia.org/wiki/Capability-based_security)，并带来同样“通过构造（by-construction）”的解决方案，以消除 [环境权限（ambient authority）](https://en.wikipedia.org/wiki/Ambient_authority)，默认情况下，在任何地方使用[最小权限原则](https://en.wikipedia.org/wiki/Principle_of_least_privilege)。下次见。  
+在这系列的下一篇文章中，我们将会看看这些安全性基础如何让我们带来作为编程模型和类型系统头等公民的[基于功能的安全模型](https://en.wikipedia.org/wiki/Capability-based_security)，并带来同样“从根子上（by-construction）”的解决方案，以消除 [环境权限（ambient authority）](https://en.wikipedia.org/wiki/Ambient_authority)，默认情况下，在任何地方使用[最小权限原则](https://en.wikipedia.org/wiki/Principle_of_least_privilege)。下次见。  
