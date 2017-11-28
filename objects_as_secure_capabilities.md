@@ -60,3 +60,8 @@ MyProgram(file);
 
 Butler Lampson 的经典论文《[保护](http://research.microsoft.com/en-us/um/people/blampson/08-Protection/Acrobat.pdf)》清楚地阐明了一些关键的根本原则，如不可伪造的令牌。某种意义上，我们系统中的每个对象都是它自己的“保护域”。我也喜欢用[能力迷思批驳（Capability Myths Demolished）](http://srl.cs.jhu.edu/pubs/SRL2003-02.pdf)的方式来比较和对照能力（capabilities）和经典的安全模型，如果你想要更多的细节（或错误地认为二者是同构）的话。
 
+Midori 绝不是第一个在以对象能力（object capabilities）作为核心建立的操作系统。实际上，我们从 [KeyKOS](http://www.cis.upenn.edu/~KeyKOS/NanoKernel/NanoKernel.html) 和它的后继者 [EROS](https://en.wikipedia.org/wiki/EROS_(microkernel)) 和 [Coyotos](http://www.coyotos.org/docs/misc/eros-comparison.html) 中得到了重要的启发。这些系统跟 Midori 一样，使用面向对象的方式来提供能力（capabilities）。我们足够幸运地在团队里得到这些项目的一些原先的设计师。
+
+在继续之前，先给出一个警告：有些系统混淆使用了“能力（capability）”这个术语，虽然它们不是真正的能力（capability）系统。[POSIX 定义了一个这样的系统](http://c2.com/cgi/wiki?PosixCapabilities)，[因此 Linux 和 Android 继承了它](https://www.kernel.org/pub/linux/libs/security/linux-privs/kernel-2.2/capfaq-0.2.txt)。虽然 POSIX 的能力（capabilities）是比典型经典的环境状态和访问控制方法好 —— 跟通常的比较允许细粒度的控制 —— 但它们更接近于传统的那种，而不是我们在这里讨论的这种真正的能力（capability）。
+
+## 对象和状态
