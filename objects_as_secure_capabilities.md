@@ -58,3 +58,5 @@ MyProgram(file);
 
 事实是哪些就是所有当你尝试设计一个使用能力（capabilities）的文件系统时会遭遇的有趣的问题。你可能不想允许自由地枚举整个文件系统层级，以为如果你获准访问一个 Filesystem 对象 —— 或文件系统的根目录对象 —— 你就可以访问一切可及的东西。那就是当你开始处理能力（capabilities）时你所做的那种思考。你仔细考虑信息的封装和暴露，因为所有你得到的都是用来保证你系统安全的对象。可能你会有个办法，程序请求访问 Filesystem 某处的一些状态，以声明的方式，然后“能力符咒（capability oracle）”决定是否将这些状态交给你。这是我们的应用程序模型所扮演的角色，以及是 main 如何掌握一个程序的清单请求它需要的能力（capabilities）的。从那点起，它就只是对象。关键是在整个系统中没有一个地方你能找得到经典的那种环境权限，因此也没有这种在它们构造时可以“欺骗”的抽象。
 
+Butler Lampson 的经典论文《[保护](http://research.microsoft.com/en-us/um/people/blampson/08-Protection/Acrobat.pdf)》清楚地阐明了一些关键的根本原则，如不可伪造的令牌。某种意义上，我们系统中的每个对象都是它自己的“保护域”。我也喜欢用[能力迷思批驳（Capability Myths Demolished）](http://srl.cs.jhu.edu/pubs/SRL2003-02.pdf)的方式来比较和对照能力（capabilities）和经典的安全模型，如果你想要更多的细节（或错误地认为二者是同构）的话。
+
