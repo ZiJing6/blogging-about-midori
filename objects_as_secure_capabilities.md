@@ -76,3 +76,7 @@ Midori 绝不是第一个在以对象能力（object capabilities）作为核心
 
 完全消除可变的静态内容改进了我们系统的可靠性，这难以量化，也很难去泛泛而说。这是我最怀念的东西之一。
 
+回想上面我提及的 Clock。这是一个极端的例子，不过是的，那就是这样的，没有全局的函数来读取时间，像 C 的 localtime 或 C# 的 DateTime.Now。要获取时间，你必须显式请求一个 Clock 能力（capability）。这有从整个类和函数中消除不确定性的效果。一个不进行 IO 的静态函数 —— [这在我们类型系统中是我们可以确定的东西（想一下 Haskell 的 monads）](http://research.microsoft.com/apps/pubs/default.aspx?id=170528)—— 现在变成纯函数式的、可记录的、和甚至有时候我们可以在编译时求值的（有点像 steroids 上的  [constexpr](http://en.cppreference.com/w/cpp/language/constexpr)）。
+
+我首先得承认，开发人员经历了一个成熟的过程，当他们在对象能力（capability）系统中学习设计模式的时候。随着时间推移，“大包装”的能力（capabilities）的增长，和/或能力（capabilities）被在不适当的时候请求，变得很常见。例如，想象一个 Stopwatch API。它可能需要 Clock。你需要将 Clock 传递到每一个需要访问当前时间的操作中吗（像 Start 和 Stop）？或者你事先用一个 Clock 实例构造 Stopwatch，从而封装 Stopwatch 对时间的使用，使它更容易传递给其他人（重要的是要认识到，这实质上赋予了接收者读取时间的能力）。另一个例子是，如果你的抽象需要请求 15 个不同的能力（capabilities）来完成工作，那它的构造方法使用一个 15 个对象的平摊列表吗？多么笨拙和烦人的构造方法啊！相反，更好的方法是逻辑地将这些能力（capabilities）分组到不同的对象中，甚至可能使用上下文相关的存储，像 parent 和 children，来让获取它们变得更加容易。
+
