@@ -78,7 +78,7 @@ Midori 绝不是第一个在以对象能力（object capabilities）作为核心
 
 回想上面我提及的 Clock。这是一个极端的例子，不过是的，那就是这样的，没有全局的函数来读取时间，像 C 的 localtime 或 C# 的 DateTime.Now。要获取时间，你必须显式请求一个 Clock 能力（capability）。这有从整个类和函数中消除不确定性的效果。一个不进行 IO 的静态函数 —— [这在我们类型系统中是我们可以确定的东西（想一下 Haskell 的 monads）](http://research.microsoft.com/apps/pubs/default.aspx?id=170528)—— 现在变成纯函数式的、可记录的、和甚至有时候我们可以在编译时求值的（有点像 steroids 上的  [constexpr](http://en.cppreference.com/w/cpp/language/constexpr)）。
 
-我首先得承认，开发人员经历了一个成熟的过程，当他们在对象能力（capability）系统中学习设计模式的时候。随着时间推移，“大包装”的能力（capabilities）的增长，和/或能力（capabilities）被在不适当的时候请求，变得很常见。例如，想象一个 Stopwatch API。它可能需要 Clock。你需要将 Clock 传递到每一个需要访问当前时间的操作中吗（像 Start 和 Stop）？或者你事先用一个 Clock 实例构造 Stopwatch，从而封装 Stopwatch 对时间的使用，使它更容易传递给其他人（重要的是要认识到，这实质上赋予了接收者读取时间的能力）。另一个例子是，如果你的抽象需要请求 15 个不同的能力（capabilities）来完成工作，那它的构造方法使用一个 15 个对象的平摊列表吗？多么笨拙和烦人的构造方法啊！相反，更好的方法是逻辑地将这些能力（capabilities）分组到不同的对象中，甚至可能使用上下文相关的存储，像 parent 和 children，来让获取它们变得更加容易。
+我首先得承认，开发人员经历了一个成熟的过程，在他们在对象能力（capability）系统中学习设计模式的时候。随着时间推移，“大包装”的能力（capabilities）的增长，和/或能力（capabilities）被在不适当的时候请求，变得很常见。例如，想象一个 Stopwatch API。它可能需要 Clock。你需要将 Clock 传递到每一个需要访问当前时间的操作中吗（像 Start 和 Stop）？或者你事先用一个 Clock 实例构造 Stopwatch，从而封装 Stopwatch 对时间的使用，使它更容易传递给其他人（重要的是要认识到，这实质上赋予了接收者读取时间的能力）。另一个例子是，如果你的抽象需要请求 15 个不同的能力（capabilities）来完成工作，那它的构造方法使用一个 15 个对象的平摊列表吗？多么笨拙和烦人的构造方法啊！相反，更好的方法是逻辑地将这些能力（capabilities）分组到不同的对象中，甚至可能使用上下文相关的存储，像 parent 和 children，来让获取它们变得更加容易。
 
 经典的面向对象系统的弱点也从隐藏中暴露出来。例如，向下类型转换（downcasting），意味着你不能完全相信子类化作为[信息隐藏](https://en.wikipedia.org/wiki/Information_hiding)的手段。如果你请求一个 File，而我给你提供一个我自己的从 File 继承过来的，添加了它自己的公共的云相关的函数的 CloudFile，你可能偷偷向下类型转换到 CloudFile 并且可以做我不打算让你做的事。我们通过严格限制类型转换和把最敏感的能力（capabilities）放置在完全不同的计划来解决这个问题……
 
