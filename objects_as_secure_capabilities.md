@@ -91,3 +91,6 @@ Midori 绝不是第一个在以对象能力（object capabilities）作为核心
 在操作系统中实现整体安全以及我们如何构建分布式的、高度并发安全系统的统一，是我们最大、最具创新性和最重要的成就之一。
 
 我得提一下，跟一般的能力（capabilities）概念一样，类似的概念在 Midori 之前就已经被提倡了。虽然我们没有直接使用这语言，从 [Joule](https://en.wikipedia.org/wiki/Joule_(programming_language)) 语言和之后的 [E](https://en.wikipedia.org/wiki/E_(programming_language)) 语言，为我们奠定了一些非常强大的基础。[Mark Miller 2006 年的博士论文](http://www.erights.org/talks/thesis/markm-thesis.pdf)是这领域的一个宝库。我们有幸与同我共事过的最聪明的人之一密切合作，他恰巧是这两个系统的首席设计师。
+
+## 总结
+
