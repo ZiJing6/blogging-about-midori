@@ -88,3 +88,6 @@ Midori 绝不是第一个在以对象能力（object capabilities）作为核心
 
 在上面的文件系统示例中，我们的系统经常将 Filesystem 引用背后真正的对象寄宿在一起的另一个不同的进程中。就是那样，调用一个方法实际上是分发一个对另一个服务这个调用的进程的远程调用。所以实际上，绝大多数的，虽然不是所有，能力（capabilities）是异步对象；或者更精确地说，不可伪造的令牌允许一个进程跟它们交互，这是我们称之为“最终”能力（capability）的东西。Clock 是个反例。他是我们称之为“即刻”的能力（capability）：那些包装了系统调用，而不是远程调用的东西。但大多数安全相关的能力（capabilities）往往是远程的，因为大多数需要授权的有意思的东西底下都是某种 IO。你很少会需要授权来进行计算。实际上，文件系统、网络栈、设备驱动、图形表面（graphics surfaces），以及更多的东西都是用最终能力（capabilities）的形式表示。
 
+在操作系统中实现整体安全以及我们如何构建分布式的、高度并发安全系统的统一，是我们最大、最具创新性和最重要的成就之一。
+
+我得提一下，跟一般的能力（capabilities）概念一样，类似的概念在 Midori 之前就已经被提倡了。虽然我们没有直接使用这语言，从 [Joule](https://en.wikipedia.org/wiki/Joule_(programming_language)) 语言和之后的 [E](https://en.wikipedia.org/wiki/E_(programming_language)) 语言，为我们奠定了一些非常强大的基础。[Mark Miller 2006 年的博士论文](http://www.erights.org/talks/thesis/markm-thesis.pdf)是这领域的一个宝库。我们有幸与同我共事过的最聪明的人之一密切合作，他恰巧是这两个系统的首席设计师。
