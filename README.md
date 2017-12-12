@@ -19,7 +19,7 @@
     3. [异步一切](https://github.com/ZiJing6/blogging-about-midori/blob/master/asynchronous_everything.md)  
     4. [安全的本机代码](https://github.com/ZiJing6/blogging-about-midori/blob/master/safe_native_code.md)  
     5. [错误模型](https://github.com/ZiJing6/blogging-about-midori/blob/master/the_error_model.md)  
-    6. [性能文化](https://github.com/ZiJing6/blogging-about-midori/blob/master/performance_culture.md)  （翻译中）  
+    6. [性能文化](https://github.com/ZiJing6/blogging-about-midori/blob/master/performance_culture.md)  
     7. [并发 15 年](https://github.com/ZiJing6/blogging-about-midori/blob/master/15_years_of_concurrency.md)  
 
 Midori 是一段迷人的旅程，是我职业生涯里最开心的一段日子。我期待能够与你分享这一段旅程。 
