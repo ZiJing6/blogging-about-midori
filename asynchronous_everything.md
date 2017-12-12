@@ -197,7 +197,7 @@ IAsyncEnumerable<Movie> GetMovies(string url) {
 
 我们在拉和推之间提供了桥梁，用一种[响应式](https://rx.codeplex.com/)的 IObservable&lt;T>/IObserver&lt;T> 适配器的形式。我不会宣称他们非常成功，然而对于不采用数据流的有边际影响的操作，他们是很有用的。实际上，我们的整个 UI 框架是基于[函数式响应式编程](https://en.wikipedia.org/wiki/Functional_reactive_programming)这个概念的，这需要跟 Reactive Framework 有点不同，为了性能。我们就不继续展开来说了。
 
-一个有趣的结果是，在先 await 再返回一个 T 的方法，和直接返回一个 Async&lt;T> 的方法之间，带来了一种新的差异，。以前类型系统并不存在这种区别。坦白地说，这让我们很郁闷，现在也还是这样。例如：
+一个有趣的结果是，在先 await 再返回一个 T 的方法，和直接返回一个 Async&lt;T> 的方法之间，带来了一种新的差异。以前类型系统并不存在这种区别。坦白地说，这让我们很郁闷，现在也还是这样。例如：
 
 ```csharp
 async int Bar()  { return await Foo(); }
