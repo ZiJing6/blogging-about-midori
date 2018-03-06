@@ -382,7 +382,7 @@ immutable List<int> frozen = new List<int>(new[] { 0, ..., 9 });
 
 #### 无环境权限
 
-Midori 的一个原则是消除[环境权限](https://en.wikipedia.org/wiki/Ambient_authority)，这允许[基于能力的安全](https://github.com/ZiJing6/blogging-about-midori/blob/master/objects_as_secure_capabilities.md)，然而以一种微妙的方式也对不变性和下面要提到的安全并发抽象是很必要的。
+Midori 的一个原则是消除[环境权限](https://en.wikipedia.org/wiki/Ambient_authority)，这允许[基于权能的安全](https://github.com/ZiJing6/blogging-about-midori/blob/master/objects_as_secure_capabilities.md)，然而以一种微妙的方式也对不变性和下面要提到的安全并发抽象是很必要的。
 
 要知道为什么，让我们看看之前提到的 PureFunc 例子。这给了我们一种局部推断 lambda 表达式捕获的状态的方法。一种我们渴望的特性是函数只接受 immutable 的输入并形成[引用透明（Referential transparency）](https://en.wikipedia.org/wiki/Referential_transparency)的结果，这解锁了许多[创新的编译器优化](https://github.com/ZiJing6/blogging-about-midori/blob/master/safe_native_code.md)并更容易推断代码。
 
@@ -400,7 +400,7 @@ PureFunc<int> func = () => x++;
 
 所有的副作用需要暴露给类型系统。过去的几年里，我们探索额外的标记来表示“这个方法会可变地访问静态变量”；然而，mutable 权限已经是我们处理这种情况的方法了，而且感觉上跟 Midori 采用的对于环境权限整体的立场是一致的。
 
-因此，我们排除了所有的环境副作用操作，替代为利用能力对象。这明显覆盖了I/O操作 —— 所有I/O在我们的系统中都是异步的RPC —— 同时甚至 —— 某种程度是从根本上 —— 意味着即使只是获取当前时间，或者生成一个随机数，都需要一个能力对象。这让我们以类型系统能看到的方式来对副作用进行建模，并同时收获能力对象带来的其他好处。
+因此，我们排除了所有的环境副作用操作，替代为利用权能对象。这明显覆盖了I/O操作 —— 所有I/O在我们的系统中都是异步的RPC —— 同时甚至 —— 某种程度是从根本上 —— 意味着即使只是获取当前时间，或者生成一个随机数，都需要一个权能对象。这让我们以类型系统能看到的方式来对副作用进行建模，并同时收获权能对象带来的其他好处。
 
 这意味着所有的静态变量必须是不可变的。 这本质上将 C# 的 const 关键字带给了所有的静态变量：
 

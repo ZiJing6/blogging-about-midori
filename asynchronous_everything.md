@@ -284,7 +284,7 @@ class MyCalculator : ICalculator {
 }
 ```
 
-每个服务器端的对象还可以通过公开一个构造函数来请求[能力](https://en.wikipedia.org/wiki/Capability-based_security)，非常类似程序的 main 入口点，就像我在[前一篇文章](https://github.com/ZiJing6/blogging-about-midori/blob/master/objects_as_secure_capabilities.md)里描述的那样。我们的应用程序模型负责激活和连接服务器的程序和服务。
+每个服务器端的对象还可以通过公开一个构造函数来请求[权能](https://en.wikipedia.org/wiki/Capability-based_security)，非常类似程序的 main 入口点，就像我在[前一篇文章](https://github.com/ZiJing6/blogging-about-midori/blob/master/objects_as_secure_capabilities.md)里描述的那样。我们的应用程序模型负责激活和连接服务器的程序和服务。
 
 服务端还能返回其他对象的引用，不管是它自身进程的还是别的远端进程的。系统使用垃圾回收器来协调和管理对象的生命周期。例如，树：
 
