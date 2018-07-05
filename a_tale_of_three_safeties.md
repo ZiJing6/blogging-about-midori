@@ -21,9 +21,9 @@ Midori 是在三种安全性的基础上建立的：类型、内存以及并发�
 
 为了利用它们其中最好的部分，多种技术经常相互结合使用，称之为深度防护。
 
-保证安全性的运行时方面的方法包括 [Google 的 C++ sanitizers](https://github.com/google/sanitizers) 和 [微软的 "/guard" 特性](http://blogs.msdn.com/b/vcblog/archive/2014/12/08/visual-studio-2015-preview-work-in-progress-security-feature.aspx)。语言方面的方法包括 C#、Java、绝大多数函数式语言、Go 等等。但我们已经发现一些攻击，因为 C# 有 unsafe 关键字，允许 unsafe 区域违反安全 。
+保证安全性的运行时方面的方法包括 [Google 的 C++ sanitizers](https://github.com/google/sanitizers) 和 [微软的 "/guard" 特性](http://blogs.msdn.com/b/vcblog/archive/2014/12/08/visual-studio-2015-preview-work-in-progress-security-feature.aspx)。语言方面的方法包括 C#、Java、绝大多数函数式语言、Go 等等。但我们已经发现一些攻击，因为 C# 有 `unsafe` 关键字，允许 `unsafe` 区域违反安全 。
 
-那么，现在你要开发一个操作系统，主要任务是要控制硬件资源、缓冲区、服务和应用程序并行运行，诸如此类，所有的的这些都是该死的不安全（unsafe）的东西，你该怎样用安全的语言来搞定呢？好问题！
+那么，现在你要开发一个操作系统，主要任务是要控制硬件资源、缓冲区、服务和应用程序并行运行，诸如此类，所有的的这些都是该死的不安全（`unsafe`）的东西，你该怎样用安全的语言来搞定呢？好问题！
 
 答案出乎意料的简单：分层。
 
@@ -35,7 +35,7 @@ Midori 是在三种安全性的基础上建立的：类型、内存以及并发�
 
 你可能想知道所有这些安全的开销。简而言之，没有了指针运算、数据争用这种操作，的确是有些事情你做不到的。我们做了很多工作来最小化额外的开销。现在我可以很高兴的说，最后我们的确完成了一个有竞争力的系统。在系统自己之上建立系统是让我们保持坦诚的关键。事实证明，像非阻塞式 IO、轻量级进程、细粒度并发、异步消息分发、还有更多类似的架构决定带来的好处，远远超过整个软件栈上下都实行安全带来的“无足轻重的”开销。
 
-举例来说，我们真有些类型只是些数据位堆。但这些只是些[被动数据结构（PODs)](https://en.wikipedia.org/wiki/Passive_data_structure)。这使我们能够在字节缓冲区中解析数据位 —— 而且能够在完全不同的“类型”中互相转换 —— 高效而且没有损失安全。我们有一个头等公民的切片类型，允许我们在缓冲区上构造安全的、检查(checked)的窗口，统一了我们所有访问系统中内存的方法。（我们加到 .NET 中的这个[切片类型](https://github.com/joeduffy/slice.net)就是受它启发的。）
+举例来说，我们真有些类型只是些数据位堆。但这些只是些[被动数据结构（PODs)](https://en.wikipedia.org/wiki/Passive_data_structure)。这使我们能够在字节缓冲区中解析数据位 —— 而且能够在完全不同的“类型”中互相转换 —— 高效而且没有损失安全。我们有一个头等公民的切片类型，允许我们在缓冲区上构造安全的、检查(`checked`)的窗口，统一了我们所有访问系统中内存的方法。（我们加到 .NET 中的这个[切片类型](https://github.com/joeduffy/slice.net)就是受它启发的。）
 
 你可能也想知道支持类型安全的[运行时类型信息 (RTTI) ](https://en.wikipedia.org/wiki/Run-time_type_information)的开销。感谢 PODs 和对[可辨识联合（discriminated unions）](https://en.wikipedia.org/wiki/Tagged_union) 适当的支持，我们不需要经常转换类型。而且当我们需要做转换的时候，编译器能帮忙优化处理结构地狱（hell out of the structures）。结果就是不会比典型的只支持虚拟分发的 C++ 程序开销大多少（不用在意转换）。
 
