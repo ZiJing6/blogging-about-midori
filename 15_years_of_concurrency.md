@@ -191,7 +191,7 @@ Bill 再次下结论：“我们需要搞这个。”所以我滚去开工了！
 
 之前我没说过，但在我之前在 PFX 的工作中，消息传递明显是缺席的。有多方面的原因。首先，是有很多与之竞赛的成果，但没有一个“感觉”对头的。例如，[并发和协调运行时（Concurrency and Coordination Runtime(CCR)）](https://en.wikipedia.org/wiki/Concurrency_and_Coordination_Runtime)非常复杂（但有很多满意的客户）；Axum 语言，呃，一种新的语言；MSR 的 [Cω](http://research.microsoft.com/en-us/um/cambridge/projects/comega/) 很强大，但需要语言的变化，让人不禁犹豫要不要追一下（虽然衍生出了只需要库就能工作的努力，还有[牛人加入](http://research.microsoft.com/en-us/um/people/crusso/joins/)，有了一些保障）；等等。另外，每个人似乎对基本的概念应该是怎么样的都有不同的想法，它没有带来什么帮助。
 
-但这归根到底都是隔离。对于我们来说很有必要用来提供安全、无处不在且容易的消息传递的细粒度隔离，Windows 进程太重量级了。而且 Windows 上没有适合这种任务的进程内隔离技术：[COM apartments](https://en.wikipedia.org/wiki/Component_Object_Model#Threading)、CLR AppDomain …… 许多有缺陷的尝试立刻涌上心头；坦白说，我真不愿挂在那座山上。
+但这归根到底都是隔离。对于我们来说很有必要用来提供安全、无处不在且容易的消息传递的细粒度隔离，Windows 进程太重量级了。而且 Windows 上没有适合这种任务的进程内隔离技术：[COM apartments](https://en.wikipedia.org/wiki/Component_Object_Model#Threading)、CLR AppDomain …… 许多有缺陷的尝试立刻涌上心头；坦白说，我真不愿全身心去投入这一块。
 
 （在那之后，我得说明，有了一些很不错的成果，像 [Orleans](https://github.com/dotnet/orleans) —— 某种程度是由一些前 Midori 成员构建的 —— [TPL Dataflow](https://msdn.microsoft.com/en-us/library/hh228603(v=vs.110).aspx)，还有 [Akka.NET](http://getakka.net/)，如果你现在想在 .NET 搞 actor 和/或 消息传递，我推荐你去尝试下它们。）
 
